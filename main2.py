@@ -42,7 +42,7 @@ class Agent:
     def score(self):
         return 1 - ((self.size - self.data.count('1')) / self.size)
 
-    # Swith a bit in the string by an index.
+    # Switch a bit in the string by an index.
     def switch_bit(self, bit_to_flip):
         if (self.data[bit_to_flip] == '0') :
             self.data[bit_to_flip]='1'
@@ -51,16 +51,35 @@ class Agent:
 
     # Flip one random bit in the string
     def mutation_bit_flip_1_n(self):
-        bit_to_flip = random.random.randrange(0, self.size)
-        switch_bit(bit_to_flip)
+        bit_to_flip = random.randrange(0, self.size)
+        self.switch_bit(bit_to_flip)
 
+    # Flip 3 random bit in the string
     def mutation_bit_flip_3_n(self):
-        for x in range(3):
-            self.mutation_bit_flip_1_n()
+        #only if the length of our data is > 3
+        if self.size > 3:
+            #We first select 3 random bits to flip
+            #eg : >>> random.sample([1, 2, 3, 4, 5],  3)  -> [4, 1, 5]
+            number_to_choose_in = []
+            for x in range(self.size):
+                number_to_choose_in.insert(0, x)
+            random_numbers = random.sample(number_to_choose_in, 3)
+            #flip the bits
+            for x in range(len(random_numbers)):
+                self.switch_bit(random_numbers[x])
 
     def mutation_bit_flip_5_n(self):
-        for x in range(5):
-            self.mutation_bit_flip_1_n()
+        #only if the length of our data is > 3
+        if self.size > 5:
+            #We first select 5 random bits to flip
+            #eg : >>> random.sample([1, 2, 3, 4, 5],  3)  -> [4, 1, 5]
+            number_to_choose_in = []
+            for x in range(self.size):
+                number_to_choose_in.insert(0, x)
+            random_numbers = random.sample(number_to_choose_in, 5)
+            #flip the bits
+            for x in range(len(random_numbers)):
+                self.switch_bit(random_numbers[x])
 
     def mutation_bit(self):
         print("mutation")
@@ -96,10 +115,24 @@ class Population:
         return self.agents[:number_of_agent_to_return]
 
     def select_random_agents(self,number_of_agent_to_return):
-        return "@TODO"
+        agent_to_return = []
+        agents_in_population = self.agents.copy()
+        for x in number_of_agent_to_return:
+            random_number = random.random.randrange(0, len(agents_in_population))
+            agent_to_return.insert(0,agents_in_population[random_number])
+            agents_in_population.remove(agents_in_population[random_number])
+        return agent_to_return
 
-    def select_tournament_agents(self,number_of_agent_to_return):
-        return "@TODO"
+    def select_tournament_agents(self,number_of_agent_to_return, number_of_turn ):
+        agent_to_return = []
+        for x in range(number_of_agent_to_return):
+            best_agent = select_random_agents(1)
+            for y in range(number_of_turn):
+                new_agent=select_random_agents(1)
+                if (best_agent.score <new_agent.score ):
+                    best_agent=new_agent
+            agent_to_return.insert(0, best_agent)
+        return agent_to_return
 
     def croisement(self, agent1, agent2):
         #@TODO : ADD ONE POINT TO SLICE
@@ -128,7 +161,7 @@ def mutate(population, number_of_agent):
     new_population.add(population.select_best_agents(number_of_agent))
     return new_population
 
-
+'''
 size = 8
 number_of_agent_to_select = 2
 
@@ -161,8 +194,5 @@ plt.xlabel('Generation')
 #plt.show()
 
 
-print(population.select_best_agents(1)[0])
-population.select_best_agents(1)[0].mutation_bit()
-print(population.select_best_agents(1)[0])
-
 print("fin")
+'''
