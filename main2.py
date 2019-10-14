@@ -31,7 +31,7 @@ class Agent:
         self.id = id
 
     def __str__(self):
-        return "Agent " + str(self.id) + ", " + ''.join(self.data) + " | Score : " + str(self.score()) + "\n"
+        return "Agent " + str(self.id) + ", " + ''.join(self.data) + " | Score : " + str(self.score())
 
     def __repr__(self):
         return self.__str__()
@@ -82,7 +82,6 @@ class Agent:
                 self.switch_bit(random_numbers[x])
 
     def mutation_bit(self):
-        print("mutation")
         for x in range(self.size):
             if random.random() < (1/self.size):
                 self.switch_bit(x)
@@ -91,7 +90,7 @@ class Agent:
 
 
 class Population:
-    def __init__(self, size):
+    def __init__(self, size=0):
         self.size = size
         self.agents = []
         for x in range(size):
@@ -105,34 +104,41 @@ class Population:
     def __str__(self):
         string_to_return = ""
         for agent in  self.agents:
-            string_to_return += (agent.__str__())
+            string_to_return += (agent.__str__()+"\n")
         return string_to_return
 
     def __repr__(self):
         return self.__str__()
 
+    def get(self, index):
+        return self.agents[index]
+
     def select_best_agents(self,number_of_agent_to_return):
-        return self.agents[:number_of_agent_to_return]
+        new_population_to_return = Population()
+        new_population_to_return.add_agents(self.agents[:number_of_agent_to_return])
+        return new_population_to_return
 
     def select_random_agents(self,number_of_agent_to_return):
-        agent_to_return = []
+        new_population_to_return = Population()
         agents_in_population = self.agents.copy()
-        for x in number_of_agent_to_return:
-            random_number = random.random.randrange(0, len(agents_in_population))
-            agent_to_return.insert(0,agents_in_population[random_number])
+        for x in range(number_of_agent_to_return):
+            random_number = random.randrange(0, len(agents_in_population))
+            new_population_to_return.add_an_agent(agents_in_population[random_number])
             agents_in_population.remove(agents_in_population[random_number])
-        return agent_to_return
+        return new_population_to_return
 
     def select_tournament_agents(self,number_of_agent_to_return, number_of_turn ):
-        agent_to_return = []
+        copy_of_agents=self.agents.copy()
+        new_population_to_return = Population()
         for x in range(number_of_agent_to_return):
-            best_agent = select_random_agents(1)
+            population_with_best_agent = copy_of_agents[random.randrange(0, len(copy_of_agents))]
             for y in range(number_of_turn):
-                new_agent=select_random_agents(1)
-                if (best_agent.score <new_agent.score ):
-                    best_agent=new_agent
-            agent_to_return.insert(0, best_agent)
-        return agent_to_return
+                population_with_new_agent=copy_of_agents[random.randrange(0, len(copy_of_agents))]
+                if (population_with_best_agent.score() <population_with_new_agent.score() ):
+                    population_with_best_agent=population_with_new_agent
+            new_population_to_return.add_an_agent(population_with_best_agent)
+            copy_of_agents.remove(population_with_best_agent)
+        return new_population_to_return
 
     def croisement(self, agent1, agent2):
         #@TODO : ADD ONE POINT TO SLICE
@@ -147,9 +153,16 @@ class Population:
 
 
 
-    def add(self,agents):
+    def add_agents(self,agents):
         for agent in agents:
             self.agents.insert(0,agent)
+        self.sort()
+
+    def add_an_agent(self,agent):
+        self.agents.insert(0, agent)
+        self.sort()
+
+
 
 
 def init_string_to_get(size):

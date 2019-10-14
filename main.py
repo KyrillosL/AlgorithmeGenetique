@@ -36,6 +36,7 @@ class Population:
     def __init__(self, size):
         self.size = size
         self.agents = []
+        #Init the population with random data
         for x in range(size):
             l = [random.randrange(0, 2) for y in range(size)]
             self.agents.append(Agent("".join(str(x) for x in l), size, x))
@@ -46,8 +47,9 @@ class Population:
 
     def __str__(self):
         string_to_return = ""
-        for agent in  self.agents:
+        for agent in self.agents:
             string_to_return += (agent.__str__())
+            string_to_return += "\n"
         return string_to_return
 
     def __repr__(self):
