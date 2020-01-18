@@ -15,8 +15,7 @@ bit flip chaque gene a 1/N chance de changer
 #Various import
 import random
 from copy import copy
-import matplotlib.pyplot as plt
-plt.style.use('seaborn-whitegrid')
+
 import numpy as np
 
 
@@ -39,62 +38,20 @@ class Agent:
     def __gt__(self, other):
         return (self.score() > other.score())
 
+    def __copy__(self):
+        return Agent(self.data, self.id)
+
     def score(self):
-        return 1 - ((self.size - self.data.count('1')) / self.size)
-
-    # Switch a bit in the string by an index.
-    def switch_bit(self, bit_to_flip):
-        if (self.data[bit_to_flip] == '0') :
-            self.data[bit_to_flip]='1'
-        else:
-            self.data[bit_to_flip]='0'
-
-    # Flip one random bit in the string
-    def mutation_bit_flip_1_n(self):
-        bit_to_flip = random.randrange(0, self.size)
-        self.switch_bit(bit_to_flip)
-
-    # Flip 3 random bit in the string
-    def mutation_bit_flip_3_n(self):
-        #only if the length of our data is > 3
-        if self.size > 3:
-            #We first select 3 random bits to flip
-            #eg : >>> random.sample([1, 2, 3, 4, 5],  3)  -> [4, 1, 5]
-            number_to_choose_in = []
-            for x in range(self.size):
-                number_to_choose_in.insert(0, x)
-            random_numbers = random.sample(number_to_choose_in, 3)
-            #flip the bits
-            for x in range(len(random_numbers)):
-                self.switch_bit(random_numbers[x])
-
-    def mutation_bit_flip_5_n(self):
-        #only if the length of our data is > 3
-        if self.size > 5:
-            #We first select 5 random bits to flip
-            #eg : >>> random.sample([1, 2, 3, 4, 5],  3)  -> [4, 1, 5]
-            number_to_choose_in = []
-            for x in range(self.size):
-                number_to_choose_in.insert(0, x)
-            random_numbers = random.sample(number_to_choose_in, 5)
-            #flip the bits
-            for x in range(len(random_numbers)):
-                self.switch_bit(random_numbers[x])
-
-    def mutation_bit(self):
-        for x in range(self.size):
-            if random.random() < (1/self.size):
-                self.switch_bit(x)
-
-
+        return round( 1 - ((self.size - self.data.count('1')) / self.size), 4)
 
 
 class Population:
-    def __init__(self, size=0):
-        self.size = size
+    def __init__(self, nb_agent=0, taille_agent=0):
+        self.taille_agent=taille_agent
+        self.nb_agent = nb_agent
         self.agents = []
-        for x in range(size):
-            l = [random.randrange(0, 2) for y in range(size)]
+        for x in range(nb_agent):
+            l = [random.randrange(0, 2) for y in range(taille_agent)]
             self.agents.append(Agent("".join(str(x) for x in l), x))
         self.sort()
 
@@ -112,6 +69,12 @@ class Population:
 
     def get(self, index):
         return self.agents[index]
+
+    def set(self, index, agent):
+        self.agents[index]=agent
+
+    def get_agents(self):
+        return self.agents
 
     def select_best_agents(self,number_of_agent_to_return):
         new_population_to_return = Population()
@@ -163,49 +126,3 @@ class Population:
         self.sort()
 
 
-
-
-def init_string_to_get(size):
-    return "1" * size
-
-
-def mutate(population, number_of_agent):
-    new_population = Population(number_of_agent)
-    new_population.add(population.select_best_agents(number_of_agent))
-    return new_population
-
-'''
-size = 8
-number_of_agent_to_select = 2
-
-string_to_get = init_string_to_get(size)
-print("string to get: " + string_to_get)
-
-population = Population(size)
-print("Population initiale")
-print(population)
-
-# print(population.select_best_agents(2))
-generation = 0
-
-while population.select_best_agents(1)[0].score() != 1.0:
-    population.croisement(population.select_best_agents(2)[0], population.select_best_agents(2)[1])
-    if population.select_best_agents(1)[0].score() <= 0.75:
-        population = mutate(population, size - number_of_agent_to_select)
-    population.sort()
-    # print("Generation: ", str(generation))
-    # print(population.select_best_agents(1)[0])
-    plt.scatter(generation, population.select_best_agents(1)[0].score())
-    generation += 1
-
-print("Generation: ", str(generation))
-print(population.select_best_agents(1)[0])
-
-plt.ylim([0, 1])
-plt.ylabel('Score')
-plt.xlabel('Generation')
-#plt.show()
-
-
-print("fin")
-'''
