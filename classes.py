@@ -51,7 +51,9 @@ class Population:
         self.nb_agent = nb_agent
         self.agents = []
         for x in range(nb_agent):
-            l = [random.randrange(0, 2) for y in range(taille_agent)]
+            l = [0 for y in range(taille_agent)]
+
+            #l = [random.randrange(0, 2) for y in range(taille_agent)]
             self.agents.append(Agent("".join(str(x) for x in l), x))
         self.sort()
 

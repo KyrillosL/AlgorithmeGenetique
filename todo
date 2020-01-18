@@ -1,0 +1,27 @@
+USB
+BANDIT
+UNIFORM
+Appliquer les operateurs de mutation sur toute la population. (peut etre que le deuxieme de la population aura un meilleur score avec le 5n)
+
+Sélection par rang
+Cette technique de sélection choisit toujours les individus possédant les meilleurs scores d'adaptation, le hasard n'entre donc pas dans ce mode de sélection. En fait, si n individus constituent la population, la sélection appliquée consiste à conserver les k meilleurs individus (au sens de la fonction d'évaluation) suivant une probabilité qui dépend du rang (et pas de la fonction d'évaluation).
+Probabilité de sélection proportionnelle à l'adaptation
+Appelé aussi « roulette » ou « roue de la fortune », pour chaque individu, la probabilité d'être sélectionné est proportionnelle à son adaptation au problème. Afin de sélectionner un individu, on utilise le principe de la roue de la fortune biaisée. Cette roue est une roue de la fortune classique sur laquelle chaque individu est représenté par une portion proportionnelle à son adaptation. On effectue ensuite un tirage au sort homogène sur cette roue.
+Sélection par tournoi
+Cette technique utilise la sélection proportionnelle sur des paires d'individus, puis choisit parmi ces paires l'individu qui a le meilleur score d'adaptation.
+Sélection uniforme
+La sélection se fait aléatoirement, uniformément et sans intervention de la valeur d'adaptation. Chaque individu a donc une probabilité 1/P d'être sélectionné, où P est le nombre total d'individus dans la population.
+Lorsque deux chromosomes ont été sélectionnés, on réalise un croisement. On effectue ensuite des mutations sur une faible proportion d'individus, choisis aléatoirement. Ce processus nous fournit une nouvelle population. On réitère le processus un grand nombre de fois de manière à imiter le principe d'évolution, qui ne prend son sens que sur un nombre important de générations. On peut arrêter le processus au bout d'un nombre arbitraire de générations ou lorsqu'une solution possède une note suffisamment satisfaisante.
+
+Considérons par exemple les deux individus suivants dans une population où chaque individu correspond à une chaîne de 8 bits : A = 00110010 et B = 01010100. On ajuste la probabilité d'enjambement à 0,7 (8 × 0,7 = 5,6 alors on va croiser 6 bits sur les 8 bits des deux mots).
+
+Chromosome	Contenu
+A	00:110010
+B	01:010100
+A′	00 010100
+B′	01 110010
+Supposons ici que l'enjambement ait lieu, on choisit alors aléatoirement la place de cet enjambement (toutes les places ayant la même probabilité d'être choisies). En supposant que l'enjambement ait lieu après le deuxième allèle, on obtient A′ et B′ (« : » marquant l'enjambement sur A et B). Ensuite, chacun des gènes des fils (ici, chacun des bits des chaînes) est sujet à la mutation. De la même manière que pour les combinaisons, on définit un taux de mutation (très bas, de l'ordre de 0,001 – ici on peut s'attendre à ce que A′ et B′ restent identiques).
+
+En effectuant ces opérations (sélection de deux individus, enjambement, mutation), un nombre de fois correspondant à la taille de la population divisée par deux, on se retrouve alors avec une nouvelle population (la première génération) ayant la même taille que la population initiale, et qui contient globalement des solutions plus proches de l'optimum. Le principe des algorithmes génétiques est d'effectuer ces opérations un maximum de fois de façon à augmenter la justesse du résultat.
+
+Il existe plusieurs techniques qui permettent éventuellement d'optimiser ces algorithmes, on trouve par exemple des techniques dans lesquelles on insère à chaque génération quelques individus non issus de la descendance de la génération précédente mais générés aléatoirement. Ainsi, on peut espérer éviter une convergence vers un optimum local.
