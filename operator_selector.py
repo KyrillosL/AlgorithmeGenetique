@@ -27,6 +27,10 @@ class Operator_Selector():
         self.list_operators = [op.mutation_1_flip(1 / self.nb_operateurs), op.mutation_3_flip(1 / self.nb_operateurs),
                                op.mutation_5_flip(1 / self.nb_operateurs)]
 
+        self.used_operator=self.list_operators[0]
+
+
+
 
 
 
@@ -41,6 +45,7 @@ class roulette_fixe(Operator_Selector): #NOT REALLY A FIX
         if op.score >self.population.select_best_agents(1).get(0).score():
             new_agent = op.mutate(self.population.select_best_agents(1).get(0))
             self.population.select_best_agents(1).set(0, new_agent)
+        self.used_operator=op
 
 
 class best_operator(Operator_Selector):
@@ -53,11 +58,13 @@ class best_operator(Operator_Selector):
             new_agent = best_operator.mutate(self.population.select_best_agents(1).get(0))
             self.population.select_best_agents(1).set(0, new_agent)
 
+        self.used_operator=best_operator
+
 
 class roulette_adaptive(Operator_Selector):
 
-    def __init__(self, pmin=0.2):
-        Operator_Selector.__init__()
+    def __init__(self,population, pmin=0.2):
+        Operator_Selector.__init__(self,population)
         self.pmin = pmin
 
     def apply(self):
@@ -88,10 +95,12 @@ class roulette_adaptive(Operator_Selector):
             new_agent = chosen_op.mutate(self.population.select_best_agents(1).get(0))
             self.population.select_best_agents(1).set(0, new_agent)
 
+        self.used_operator=chosen_op
+
 class adaptive_pursuit(Operator_Selector):
 
-    def __init__(self, pmin=0.2, pmax=0.8, beta=0.5):
-        Operator_Selector.__init__()
+    def __init__(self,population, pmin=0.2, pmax=0.8, beta=0.5):
+        Operator_Selector.__init__(self,population)
         self.beta=beta
         self.pmin = pmin
         self.pmax = pmax
@@ -128,6 +137,7 @@ class adaptive_pursuit(Operator_Selector):
         if chosen_op.score > self.population.select_best_agents(1).get(0).score():
             new_agent = chosen_op.mutate(self.population.select_best_agents(1).get(0))
             self.population.select_best_agents(1).set(0, new_agent)
+        self.used_operator=best_operator
 
 
 class upper_confidence_bound(Operator_Selector): #𝐴𝑡≐𝑎𝑟𝑔𝑚𝑎𝑥𝑎[𝑄𝑡(𝑎)+𝑐𝑙𝑛𝑡𝑁𝑡(𝑎)‾‾‾‾‾√]
@@ -152,36 +162,37 @@ class upper_confidence_bound(Operator_Selector): #𝐴𝑡≐𝑎𝑟𝑔𝑚�
         self.iteration += 1
         dict_score_ucb={}
         for op in self.list_operators:
-            op.compute_Score(self.population.select_best_agents(1).get(0))
             dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(math.log(self.iteration) / op.times_used)
+            op.average_rewards = (op.score + (op.times_used - 1) * op.average_rewards) / op.times_used
 
         #print(dict_score_ucb)
         best_operator= max(dict_score_ucb.items(), key=operator.itemgetter(1))[0]
-
+        best_operator.compute_Score(self.population.select_best_agents(1).get(0))
 
 
         #best_operator= self.list_operators[0]
         for score_ucb in dict_score_ucb:
             #print(score_ucb, dict_score_ucb[score_ucb])
 
-            score_ucb.probability = dict_score_ucb[score_ucb]
-
-        print(best_operator)
+            score_ucb.probability = score_ucb.average_rewards
 
 
-        if best_operator.score >self.population.select_best_agents(1).get(0).score():
+        print("best_operator ", best_operator, " pop ", self.population.select_best_agents(1).get(0).score())
+
+
+        if best_operator.score >=self.population.select_best_agents(1).get(0).score():
             new_agent = best_operator.mutate(self.population.select_best_agents(1).get(0))
             self.population.select_best_agents(1).set(0, new_agent)
             #best_operator.probability=1
             best_operator.times_used += 1
-            op.average_rewards = (op.score+(op.times_used-1)*op.average_rewards)/op.times_used
+            #best_operator.average_rewards = (best_operator.score+(best_operator.times_used-1)*best_operator.average_rewards)/best_operator.times_used
+        self.used_operator=best_operator
 
 
-
-            # On baisse les autres :
-            #for op in self.list_operators:
-            #    if op != best_operator:
-            #        op.probability =0
+        # On baisse les autres :
+        #for op in self.list_operators:
+        #    if op != best_operator:
+        #        op.probability =0
 
 
 
