@@ -12,31 +12,28 @@ import functions as functions
 import random
 plt.style.use('seaborn-whitegrid')
 import numpy as np
+import math
+import operator
 
 
 
 class Operator_Selector():
-    def __init__(self,population, pmin=0.2, pmax=0.8, beta=0.5):
+    def __init__(self,population):
 
-        self.beta=beta
-        self.pmin = pmin
-        self.pmax = pmax
+
+
         self.population = population
         self.nb_operateurs = 3
-        seuil_min = (1 /  self.nb_operateurs) - (1 / ( self.nb_operateurs * 2))
-        self.list_operators = [op.mutation_bit_flip_1_n(1 / self.nb_operateurs), op.mutation_bit_flip_3_n(1 /  self.nb_operateurs),
-                          op.mutation_bit_flip_5_n(1 /  self.nb_operateurs)]
+        self.list_operators = [op.mutation_1_flip(1 / self.nb_operateurs), op.mutation_3_flip(1 / self.nb_operateurs),
+                               op.mutation_5_flip(1 / self.nb_operateurs)]
 
-        self.apply()
 
-    def apply(self):
-        return "BAD ROULE"
 
 
 class roulette_fixe(Operator_Selector): #NOT REALLY A FIX
     def apply(self):
         id_selected_operator = random.randrange(0,len(self.list_operators))
-        print(id_selected_operator)
+
         self.list_operators[id_selected_operator].compute_Score(self.population.select_best_agents(1).get(0))
         op = self.list_operators[id_selected_operator]
         print("SCORE OP", op)
@@ -57,7 +54,12 @@ class best_operator(Operator_Selector):
             self.population.select_best_agents(1).set(0, new_agent)
 
 
-class roulette_adaptive(Operator_Selector): #NOT REALLY A FIX
+class roulette_adaptive(Operator_Selector):
+
+    def __init__(self, pmin=0.2):
+        Operator_Selector.__init__()
+        self.pmin = pmin
+
     def apply(self):
 
         #We compute the score at the iteration +1
@@ -86,13 +88,21 @@ class roulette_adaptive(Operator_Selector): #NOT REALLY A FIX
             new_agent = chosen_op.mutate(self.population.select_best_agents(1).get(0))
             self.population.select_best_agents(1).set(0, new_agent)
 
-class adaptive_pursuit(Operator_Selector):  # NOT REALLY A FIX
+class adaptive_pursuit(Operator_Selector):
+
+    def __init__(self, pmin=0.2, pmax=0.8, beta=0.5):
+        Operator_Selector.__init__()
+        self.beta=beta
+        self.pmin = pmin
+        self.pmax = pmax
+
+
     def apply(self):
 
         # We compute the score at the iteration +1
         for op in self.list_operators:
             op.compute_Score(self.population.select_best_agents(1).get(0))
-            print(op)
+            #print(op)
 
 
 
@@ -111,38 +121,72 @@ class adaptive_pursuit(Operator_Selector):  # NOT REALLY A FIX
 
         chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
 
-        print("CHOSEN OP", chosen_op)
+        #print("CHOSEN OP", chosen_op)
 
-        input()
+        #input()
 
         if chosen_op.score > self.population.select_best_agents(1).get(0).score():
             new_agent = chosen_op.mutate(self.population.select_best_agents(1).get(0))
             self.population.select_best_agents(1).set(0, new_agent)
 
 
-        '''
+class upper_confidence_bound(Operator_Selector): #𝐴𝑡≐𝑎𝑟𝑔𝑚𝑎𝑥𝑎[𝑄𝑡(𝑎)+𝑐𝑙𝑛𝑡𝑁𝑡(𝑎)‾‾‾‾‾√]
 
-        id_selected_operator = random.randrange(0,len(self.list_operators))
-        print(id_selected_operator)
-        self.list_operators[id_selected_operator].compute_Score(self.population.select_best_agents(1).get(0))
-        op = self.list_operators[id_selected_operator]
-        print("SCORE OP", op)
+    def __init__(self, population):
+        Operator_Selector.__init__(self,population)
+        self.nb_used =0 # UCB
+        self.average_reward = 0
+        self.exploration=0.5
 
-        if op.score >self.population.select_best_agents(1).get(0).score():
-            new_agent = op.mutate(self.population.select_best_agents(1).get(0))
-            self.population.select_best_agents(1).set(0, new_agent)
-        '''
+        self.iteration=0
+
+        for op in self.list_operators:
+            op.compute_Score(self.population.select_best_agents(1).get(0))
+            op.average_rewards = op.score
+            op.times_used=1
 
 
-class poursuite_adaptative(Operator_Selector):
 
     def apply(self):
-        print("roule")
+
+        self.iteration += 1
+        dict_score_ucb={}
+        for op in self.list_operators:
+            op.compute_Score(self.population.select_best_agents(1).get(0))
+            dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(math.log(self.iteration) / op.times_used)
+            op.average_rewards= op.average_rewards+op.score/op.times_used
+
+        #print(dict_score_ucb)
+        best_operator= max(dict_score_ucb.items(), key=operator.itemgetter(1))[0]
 
 
 
+        #best_operator= self.list_operators[0]
+        for score_ucb in dict_score_ucb:
+            print(score_ucb, dict_score_ucb[score_ucb])
+
+        print(best_operator)
+
+        input()
+
+        if best_operator.score >self.population.select_best_agents(1).get(0).score():
+            new_agent = best_operator.mutate(self.population.select_best_agents(1).get(0))
+            self.population.select_best_agents(1).set(0, new_agent)
+            best_operator.probability=1
+            best_operator.times_used += 1
 
 
+            # On baisse les autres :
+            for op in self.list_operators:
+                if op != best_operator:
+                    op.probability =0
+
+
+
+        #input()
+
+
+        #operator_to_use = max(    )
 
 
 

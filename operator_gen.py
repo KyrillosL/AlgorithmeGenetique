@@ -21,6 +21,10 @@ class Operator:
         self.score = 0
         self.temporary_bit_to_switch = []
 
+        self.times_used=0
+
+        self.average_rewards = 0
+
 
     def __str__(self):
         return  "probability: " +str(self.probability) + " | Score : " + str(self.score)
@@ -49,7 +53,7 @@ class Operator:
             agent.data[bit_to_flip]='0'
 
 # Flip one random bit in the string
-class mutation_bit_flip_1_n(Operator):
+class mutation_1_flip(Operator):
 
     def __str__(self):
         return "BitFlip_1_n "+ super().__str__()
@@ -73,7 +77,7 @@ class mutation_bit_flip_1_n(Operator):
         return agent
 
 # Flip 3 random bit in the string
-class mutation_bit_flip_3_n(Operator):
+class mutation_3_flip(Operator):
 
     def __str__(self):
         return "BitFlip_3_n "+ super().__str__()
@@ -104,7 +108,7 @@ class mutation_bit_flip_3_n(Operator):
             #print("Using 3n, new score: ", agent.score())
             return agent
 
-class mutation_bit_flip_5_n(Operator):
+class mutation_5_flip(Operator):
 
     def __str__(self):
         return "BitFlip_5_n "+ super().__str__()
@@ -134,7 +138,7 @@ class mutation_bit_flip_5_n(Operator):
             #print("Using 5n, new score: ", agent.score())
             return agent
 
-class mutation_bit(Operator):
+class mutation_bit_flip(Operator):
     def mutate(self, agent):
         for x in range(self.size):
             if random.random() < (1/self.size):

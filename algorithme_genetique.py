@@ -38,16 +38,19 @@ class Algorithme_genetique:
         iteration = 0
 
         temp_score = 0
-        lo = op_sel.adaptive_pursuit(self.population, 0.05, 0.95, 0.05)
+        #lo = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
+        lo = op_sel.upper_confidence_bound(self.population)
         while self.population.select_best_agents(1).get(0).score() != 1.0:
+            lo.apply()
 
-            print(self.population.select_best_agents(1).get(0).score())
+            #print("SUM ", sum)
+            #print(self.population.select_best_agents(1).get(0).score())
             if iteration == 0:
                 temp_score = self.population.select_best_agents(1).get(0).score()
 
             if temp_score > self.population.select_best_agents(1).get(0).score():
                 print("ERROR")
-            '''
+
             plt.subplot(2, 2, 1)
             plt.ylim([0, 1])
             plt.ylabel('Score')
@@ -69,18 +72,18 @@ class Algorithme_genetique:
             plt.ylabel('Prob. 5_n')
             plt.xlabel('Generation')
             plt.scatter(iteration, lo.list_operators[2].probability, c='green', s=10)
-            '''
+
             temp_score = self.population.select_best_agents(1).get(0).score()
 
             iteration += 1
 
-            #plt.pause(0.00001)  # Note this correction
+            plt.pause(0.00001)  # Note this correction
 
 
 
         # print(population.select_best_agents(1).get(0))
 
-        #plt.show()
+        plt.show()
         print("NOMBRE ITERATION ", iteration)
         print("fin")
 
