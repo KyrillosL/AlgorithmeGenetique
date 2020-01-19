@@ -136,7 +136,7 @@ class upper_confidence_bound(Operator_Selector): #𝐴𝑡≐𝑎𝑟𝑔𝑚�
         Operator_Selector.__init__(self,population)
         self.nb_used =0 # UCB
         self.average_reward = 0
-        self.exploration=0.5
+        self.exploration=1
 
         self.iteration=0
 
@@ -154,7 +154,6 @@ class upper_confidence_bound(Operator_Selector): #𝐴𝑡≐𝑎𝑟𝑔𝑚�
         for op in self.list_operators:
             op.compute_Score(self.population.select_best_agents(1).get(0))
             dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(math.log(self.iteration) / op.times_used)
-            op.average_rewards= op.average_rewards+op.score/op.times_used
 
         #print(dict_score_ucb)
         best_operator= max(dict_score_ucb.items(), key=operator.itemgetter(1))[0]
@@ -163,23 +162,26 @@ class upper_confidence_bound(Operator_Selector): #𝐴𝑡≐𝑎𝑟𝑔𝑚�
 
         #best_operator= self.list_operators[0]
         for score_ucb in dict_score_ucb:
-            print(score_ucb, dict_score_ucb[score_ucb])
+            #print(score_ucb, dict_score_ucb[score_ucb])
+
+            score_ucb.probability = dict_score_ucb[score_ucb]
 
         print(best_operator)
 
-        input()
 
         if best_operator.score >self.population.select_best_agents(1).get(0).score():
             new_agent = best_operator.mutate(self.population.select_best_agents(1).get(0))
             self.population.select_best_agents(1).set(0, new_agent)
-            best_operator.probability=1
+            #best_operator.probability=1
             best_operator.times_used += 1
+            op.average_rewards = (op.score+(op.times_used-1)*op.average_rewards)/op.times_used
+
 
 
             # On baisse les autres :
-            for op in self.list_operators:
-                if op != best_operator:
-                    op.probability =0
+            #for op in self.list_operators:
+            #    if op != best_operator:
+            #        op.probability =0
 
 
 
