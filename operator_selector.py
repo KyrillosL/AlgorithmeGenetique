@@ -177,7 +177,7 @@ class upper_confidence_bound(Operator_Selector): #𝐴𝑡≐𝑎𝑟𝑔𝑚�
             score_ucb.probability = score_ucb.average_rewards
 
 
-        print("best_operator ", best_operator, " pop ", self.population.select_best_agents(1).get(0).score())
+        #print("best_operator ", best_operator, " pop ", self.population.select_best_agents(1).get(0).score())
 
 
         if best_operator.score >=self.population.select_best_agents(1).get(0).score():

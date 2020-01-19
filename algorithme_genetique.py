@@ -2,6 +2,7 @@ import operator_selector as op_sel
 import classes
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import gridspec
 
 
 class Algorithme_genetique:
@@ -41,50 +42,53 @@ class Algorithme_genetique:
 
 
         fig = plt.figure(figsize=(20, 10))
+        gs = gridspec.GridSpec(2, 3)  # 2 rows, 3 columns
+
         #SCORE PLOT
-        plt_score= fig.add_subplot(3, 2, 1)
+        plt_score= fig.add_subplot(gs[0,0])
         plt_score.set_ylim([0, 1.1])
         plt_score.set_ylabel('Score')
         plt_score.set_xlabel('Generation')
         line_score, = plt_score.plot([], lw=2, c='black')
 
+        #ALL PROBS PLOT
+        all_probs= fig.add_subplot(gs[0,1:])
+        all_probs.set_ylabel('All probs')
+        all_probs.set_xlabel('Generation')
+
+
+        # PROBS PLOT
         list_plt_prob=[]
         list_line_plt=[]
-
+        list_line_plt__all_probs = []
         for i in range(nb_op):
-            plt_probs =fig.add_subplot(3, 2, i+2)
-
+            plt_probs =fig.add_subplot(gs[1,i])
             plt_probs.set_xlabel('Generation')
-
-
             if i==0:
                 line, = plt_probs.plot([], lw=1, c='red')
+                line_all_probs, = all_probs.plot([], lw=0.5, c='red')
+
                 plt_probs.set_ylabel('flip 1_n')
             if i == 1:
                 line, = plt_probs.plot([], lw=1, c='green')
+                line_all_probs, = all_probs.plot([], lw=0.5, c='green')
                 plt_probs.set_ylabel('flip 3_n')
             if i == 2:
                 line, = plt_probs.plot([], lw=1, c='blue')
+                line_all_probs, = all_probs.plot([], lw=0.5, c='blue')
                 plt_probs.set_ylabel('flip 5_n')
             list_line_plt.append(line)
+            list_line_plt__all_probs.append(line_all_probs)
             list_plt_prob.append(plt_probs )
 
 
-        '''
-        #PROBS PLOT
-        plt_probs= fig.add_subplot(2, 1, 2)
-        plt_probs.set_ylim([0, 1.1])
-        plt_probs.set_ylabel('Prob')
-        plt_probs.set_xlabel('Generation')
-        line_op_1, = plt_probs.plot([], lw=3, c='red')
-        line_op_2, = plt_probs.plot([], lw=3, c='green')
-        line_op_3, = plt_probs.plot([], lw=3, c='blue')
-        '''
 
 
         fig.canvas.draw()
         score_bg = fig.canvas.copy_from_bbox(plt_score.bbox)
-        #probs_bg = fig.canvas.copy_from_bbox(plt_probs.bbox)
+
+        all_probs_bg = fig.canvas.copy_from_bbox(all_probs.bbox)
+
         list_op_bg=[]
         list_list_data_prob=[]
         for i in range(nb_op):
@@ -102,14 +106,6 @@ class Algorithme_genetique:
         data_score=[]
         data_score.append(0)
 
-        data_probs_op_1=[]
-        data_probs_op_1.append(0)
-        data_probs_op_2=[]
-        data_probs_op_2.append(0)
-        data_probs_op_3=[]
-        data_probs_op_3.append(0)
-
-
         plt.show(block=False)
 
 
@@ -124,8 +120,9 @@ class Algorithme_genetique:
             time.append(iteration)
 
             #SCORE
-            xmin_score, xmax_score, ymin_score, ymax_score = [min(time) / 1.05, max(time) * 1.1, 0, 1.1]
+            xmin_score, xmax_score, ymin_score, ymax_score = [min(time) / 1.05, max(time) * 1.01, 0, 1.1]
             plt_score.axis([xmin_score, xmax_score, ymin_score, ymax_score])
+            plt_score.set_xlim([0,iteration])
             data_score.append(self.population.select_best_agents(1).get(0).score())
             line_score.set_data(time,data_score )
             fig.canvas.restore_region(score_bg)
@@ -136,88 +133,35 @@ class Algorithme_genetique:
 
             for i in range(nb_op):
                 list_list_data_prob[i].append(lo.list_operators[i].probability)
-                xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.1, 0,max(list_list_data_prob[i])*1.1]
+                xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.01, 0,max(list_list_data_prob[i])*1.1]
                 list_plt_prob[i].axis([xmin_probs, xmax_probs, ymin_probs, ymax_probs])
+
                 list_line_plt[i].set_data(time, list_list_data_prob[i] )
+                list_line_plt__all_probs[i].set_data(time, list_list_data_prob[i] )
                 fig.canvas.restore_region( list_op_bg[i] )
                 list_plt_prob[i].draw_artist(list_line_plt[i])
                 fig.canvas.blit( list_plt_prob[i].bbox)
 
-            '''
-            #PROBS
-            data_probs_op_1.append(lo.list_operators[0].probability)
-            data_probs_op_2.append(lo.list_operators[1].probability)
-            data_probs_op_3.append(lo.list_operators[2].probability)
-            xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.1, 0, max(x.probability for x in lo.list_operators)]
-            plt_probs.axis([xmin_probs, xmax_probs, ymin_probs, ymax_probs])
 
-            line_op_1.set_data(time,data_probs_op_1 )
-            line_op_2.set_data(time, data_probs_op_2)
-            line_op_3.set_data(time, data_probs_op_3)
-            fig.canvas.restore_region(probs_bg)
-            plt_probs.draw_artist(line_op_1)
-            plt_probs.draw_artist(line_op_2)
-            plt_probs.draw_artist(line_op_3)
-            fig.canvas.blit(plt_probs.bbox)
-            '''
+            # ALL PROBS
+            xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.01, 0,max( max(s) for s in zip(*list_list_data_prob) )*1.1]
+            all_probs.axis([xmin_probs, xmax_probs, ymin_probs, ymax_probs])
+
+            fig.canvas.restore_region(all_probs_bg)
+            for i in range(nb_op):
+                #print(list_line_plt[i])
+                all_probs.draw_artist(list_line_plt__all_probs[i])
+            fig.canvas.blit(all_probs.bbox)
 
             fig.canvas.flush_events()
 
-
-            print(self.population.select_best_agents(1).get(0).score())
-            if iteration == 0:
-                temp_score = self.population.select_best_agents(1).get(0).score()
-
             if temp_score > self.population.select_best_agents(1).get(0).score():
                 print("ERROR")
-
-            '''
-            plt.subplot(3, 2, 1)
-            plt.ylim([0, 1])
-            plt.ylabel('Score')
-            plt.xlabel('Generation')
-            plt.scatter(iteration, self.population.select_best_agents(1).get(0).score(), c='black', s=10)
-            plt.subplot(3,2, 2)
-            plt.ylim([0, 1])
-            plt.ylabel('Prob. 1_n')
-            plt.xlabel('Generation')
-            plt.scatter(iteration, lo.list_operators[0].probability, c=[lo.list_operators[0].color], s=10)
-            plt.subplot(3, 2, 3)
-            plt.ylim([0, 1])
-            plt.ylabel('Prob. 3_n')
-            plt.xlabel('Generation')
-            plt.scatter(iteration, lo.list_operators[1].probability, c=[lo.list_operators[1].color], s=10)
-            plt.subplot(3, 2, 4)
-            plt.ylim([0, 1])
-            plt.ylabel('Prob. 5_n')
-            plt.xlabel('Generation')
-            plt.scatter(iteration, lo.list_operators[2].probability, c=[lo.list_operators[2].color], s=10)
-
-            plt.subplot(3, 2, 5)
-
-            plt.ylabel('Used Operator')
-            plt.xlabel('Generation')
-            #
-            plt.scatter(iteration, 0.5, c=[lo.used_operator.color], s=10)
-
-
-            plt.subplot(3, 2, 6)
-            plt.ylabel('Used Operator')
-            plt.xlabel('Generation')
-            for x in lo.list_operators:
-                plt.scatter(iteration, x.probability, c=[x.color], s=10)
-            '''
-
-
 
             temp_score = self.population.select_best_agents(1).get(0).score()
 
             iteration += 1
 
-            #plt.pause(0.0000001)  # Note this correction
-
-
-        # print(population.select_best_agents(1).get(0))
 
 
         plt.show()
