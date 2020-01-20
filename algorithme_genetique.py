@@ -1,5 +1,8 @@
 import operator_selector as op_sel
 import classes
+import matplotlib
+matplotlib.use('tkAgg')
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import gridspec
