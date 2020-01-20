@@ -30,26 +30,37 @@ class Algorithme_genetique:
         return "1" * size
 
 
-    def solve(self):
+    def solve(self, m, realtime_plot=True):
 
-        #lo = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
-        #lo = op_sel.upper_confidence_bound(self.population)
-        #lo = op_sel.best_operator(self.population)
-        #lo = op_sel.roulette_adaptive(self.population)
-        #lo = op_sel.roulette_fixe(self.population)
-        lo = op_sel.adaptive_pursuit(self.population)
-        nb_op = len(lo.list_operators)
+        # method = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
+        if m==0:
+            method = op_sel.best_operator(self.population)
+        elif m==1:
+            method = op_sel.roulette_fixe(self.population)
+        elif m == 2:
+            method = op_sel.roulette_adaptive(self.population)
+        elif m == 3:
+            method = op_sel.adaptive_pursuit(self.population)
+        elif m == 4:
+            method = op_sel.upper_confidence_bound(self.population)
+        #else:
+        #    method = op_sel.upper_confidence_bound(self.population)
+
+        nb_op = len(method.list_operators)
 
 
         fig = plt.figure(figsize=(20, 10))
         gs = gridspec.GridSpec(2, 3)  # 2 rows, 3 columns
 
+        plt.ion()
         #SCORE PLOT
         plt_score= fig.add_subplot(gs[0,0])
         plt_score.set_ylim([0, 1.1])
         plt_score.set_ylabel('Score')
         plt_score.set_xlabel('Generation')
         line_score, = plt_score.plot([], lw=2, c='black')
+        txt_score = plt_score.text(1, 1, "", fontsize=20,color='red')
+
 
         #ALL PROBS PLOT
         all_probs= fig.add_subplot(gs[0,1:])
@@ -116,47 +127,54 @@ class Algorithme_genetique:
 
 
         while self.population.select_best_agents(1).get(0).score() != 1.0 :
-            lo.apply()
+            method.apply()
+            score = self.population.select_best_agents(1).get(0).score()
+            print(score, " it ", iteration)
             time.append(iteration)
 
-            #SCORE
-            xmin_score, xmax_score, ymin_score, ymax_score = [min(time) / 1.05, max(time) * 1.01, 0, 1.1]
-            plt_score.axis([xmin_score, xmax_score, ymin_score, ymax_score])
-            plt_score.set_xlim([0,iteration])
-            data_score.append(self.population.select_best_agents(1).get(0).score())
-            line_score.set_data(time,data_score )
-            fig.canvas.restore_region(score_bg)
-            plt_score.draw_artist(line_score)
-            fig.canvas.blit(plt_score.bbox)
 
-
-
+            data_score.append(score)
             for i in range(nb_op):
-                list_list_data_prob[i].append(lo.list_operators[i].probability)
-                xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.01, 0,max(list_list_data_prob[i])*1.1]
-                list_plt_prob[i].axis([xmin_probs, xmax_probs, ymin_probs, ymax_probs])
+                list_list_data_prob[i].append(method.list_operators[i].probability)
 
-                list_line_plt[i].set_data(time, list_list_data_prob[i] )
-                list_line_plt__all_probs[i].set_data(time, list_list_data_prob[i] )
-                fig.canvas.restore_region( list_op_bg[i] )
-                list_plt_prob[i].draw_artist(list_line_plt[i])
-                fig.canvas.blit( list_plt_prob[i].bbox)
+            if realtime_plot and iteration%1000==0:
+                    #SCORE
+                    xmin_score, xmax_score, ymin_score, ymax_score = [min(time) / 1.05, max(time) * 1.01, 0, 1.1]
+                    plt_score.axis([xmin_score, xmax_score, ymin_score, ymax_score])
+                    plt_score.set_xlim([0,iteration])
+                    line_score.set_data(time,data_score )
+                    txt_score.set_text("Score "+ str(score))
+                    fig.canvas.restore_region(score_bg)
+                    plt_score.draw_artist(line_score)
+
+                    plt_score.draw_artist(txt_score)
+                    fig.canvas.blit(plt_score.bbox)
+
+                    for i in range(nb_op):
+                        xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.01, 0,max(list_list_data_prob[i])*1.1]
+                        list_plt_prob[i].axis([xmin_probs, xmax_probs, ymin_probs, ymax_probs])
+
+                        list_line_plt[i].set_data(time, list_list_data_prob[i] )
+                        list_line_plt__all_probs[i].set_data(time, list_list_data_prob[i] )
+                        fig.canvas.restore_region( list_op_bg[i] )
+                        list_plt_prob[i].draw_artist(list_line_plt[i])
+                        fig.canvas.blit( list_plt_prob[i].bbox)
 
 
-            # ALL PROBS
-            xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.01, 0,max( max(s) for s in zip(*list_list_data_prob) )*1.1]
-            all_probs.axis([xmin_probs, xmax_probs, ymin_probs, ymax_probs])
+                    # ALL PROBS
+                    xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.01, 0,max( max(s) for s in zip(*list_list_data_prob) )*1.1]
+                    all_probs.axis([xmin_probs, xmax_probs, ymin_probs, ymax_probs])
 
-            fig.canvas.restore_region(all_probs_bg)
-            for i in range(nb_op):
-                #print(list_line_plt[i])
-                all_probs.draw_artist(list_line_plt__all_probs[i])
-            fig.canvas.blit(all_probs.bbox)
+                    fig.canvas.restore_region(all_probs_bg)
+                    for i in range(nb_op):
+                        #print(list_line_plt[i])
+                        all_probs.draw_artist(list_line_plt__all_probs[i])
+                    fig.canvas.blit(all_probs.bbox)
 
-            fig.canvas.flush_events()
+                    fig.canvas.flush_events()
 
-            if temp_score > self.population.select_best_agents(1).get(0).score():
-                print("ERROR")
+            #if temp_score > self.population.select_best_agents(1).get(0).score():
+            #    print("ERROR")
 
             temp_score = self.population.select_best_agents(1).get(0).score()
 
@@ -164,6 +182,42 @@ class Algorithme_genetique:
 
 
 
+
+
+
+
+        #SHOW THE GRAPH AT THE END AND STAY IT
+        # SCORE
+        xmin_score, xmax_score, ymin_score, ymax_score = [min(time) / 1.05, max(time) * 1.01, 0, 1.1]
+        plt_score.axis([xmin_score, xmax_score, ymin_score, ymax_score])
+        plt_score.set_xlim([0, iteration])
+
+        line_score.set_data(time, data_score)
+        txt_score.set_text("Score " + str(score))
+        fig.canvas.restore_region(score_bg)
+        plt_score.draw_artist(line_score)
+        plt_score.draw_artist(txt_score)
+
+        for i in range(nb_op):
+            xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.01, 0,
+                                                              max(list_list_data_prob[i]) * 1.1]
+            list_plt_prob[i].axis([xmin_probs, xmax_probs, ymin_probs, ymax_probs])
+
+            list_line_plt[i].set_data(time, list_list_data_prob[i])
+            list_line_plt__all_probs[i].set_data(time, list_list_data_prob[i])
+            fig.canvas.restore_region(list_op_bg[i])
+            list_plt_prob[i].draw_artist(list_line_plt[i])
+
+        # ALL PROBS
+        xmin_probs, xmax_probs, ymin_probs, ymax_probs = [min(time) / 1.05, max(time) * 1.01, 0,
+                                                          max(max(s) for s in zip(*list_list_data_prob)) * 1.1]
+        all_probs.axis([xmin_probs, xmax_probs, ymin_probs, ymax_probs])
+        fig.canvas.restore_region(all_probs_bg)
+        for i in range(nb_op):
+            all_probs.draw_artist(list_line_plt__all_probs[i])
+
+
+        plt.ioff()
         plt.show()
         print("NOMBRE ITERATION ", iteration)
         print("fin")

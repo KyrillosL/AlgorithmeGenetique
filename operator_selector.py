@@ -113,10 +113,7 @@ class adaptive_pursuit(Operator_Selector):
             op.compute_Score(self.population.select_best_agents(1).get(0))
             #print(op)
 
-
-
         best_operator = max(self.list_operators)
-
 
         #On augmente le meilleur
         best_operator.probability+= self.beta*(self.pmax - best_operator.probability)
@@ -124,7 +121,6 @@ class adaptive_pursuit(Operator_Selector):
         #On baisse les autres :
         for op in self.list_operators:
             if op != best_operator:
-
                 op.probability += self.beta * (self.pmin - op.probability)
 
 
@@ -134,9 +130,9 @@ class adaptive_pursuit(Operator_Selector):
 
         #input()
 
-        if chosen_op.score > self.population.select_best_agents(1).get(0).score():
-            new_agent = chosen_op.mutate(self.population.select_best_agents(1).get(0))
-            self.population.select_best_agents(1).set(0, new_agent)
+        #if chosen_op.score > self.population.select_best_agents(1).get(0).score():
+        new_agent = chosen_op.mutate(self.population.select_best_agents(1).get(0))
+        self.population.select_best_agents(1).set(0, new_agent)
         self.used_operator=best_operator
 
 

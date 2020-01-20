@@ -7,7 +7,14 @@ parametres_algo = {
 "taille_agent":100
 }
 
+
 ag = ag.Algorithme_genetique(parametres_algo)
-ag.solve()
+
+#0 = best
+#1 = roulette fixe
+#2 = roulette adaptive
+#3= adaptive poursuit
+#4=ucb
+ag.solve(3, True)
 
 print(ag)
