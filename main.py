@@ -7,7 +7,7 @@ parametres_algo = {
 "taille_agent":100
 }
 
-
+"test"
 ag = ag.Algorithme_genetique(parametres_algo)
 
 #0 = best
