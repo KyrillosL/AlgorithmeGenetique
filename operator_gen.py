@@ -58,6 +58,8 @@ class mutation_1_flip(Operator):
     def __init__(self, init_prob):
         Operator.__init__(self,init_prob)
         self.color=[0,0,1]
+        self.pos = 0
+
     def __str__(self):
         return "BitFlip_1_n "+ super().__str__()
 
@@ -85,6 +87,7 @@ class mutation_3_flip(Operator):
     def __init__(self, init_prob):
         Operator.__init__(self,init_prob)
         self.color=[1,0,0]
+        self.pos = 0.50
 
     def __str__(self):
         return "BitFlip_3_n "+ super().__str__()
@@ -120,6 +123,7 @@ class mutation_5_flip(Operator):
     def __init__(self, init_prob):
         Operator.__init__(self,init_prob)
         self.color=[0,1,0]
+        self.pos = 1
 
     def __str__(self):
         return "BitFlip_5_n "+ super().__str__()
