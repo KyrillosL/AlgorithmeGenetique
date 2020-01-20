@@ -15,6 +15,6 @@ ag = ag.Algorithme_genetique(parametres_algo)
 #2 = roulette adaptive
 #3= adaptive poursuit
 #4=ucb
-ag.solve(3, True)
+ag.solve(4, True)
 
 print(ag)
