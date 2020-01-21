@@ -118,13 +118,29 @@ class Population:
 
 
 
+    def remove_worst_agents(self):
+        list_to_return = []
+        list_to_return.append(  min(self.agents).id)
+        self.agents.remove(min(self.agents))
+        list_to_return.append( min(self.agents).id)
+        self.agents.remove(min(self.agents))
+
+        return list_to_return
+
+
+
+
+
+
     def add_agents(self,agents):
         for agent in agents:
             self.agents.insert(0,agent)
         self.sort()
 
-    def add_an_agent(self,agent):
-        self.agents.insert(0, agent)
+    def add_an_agent(self, agent, pos):
+        self.agents.insert(pos, agent)
         self.sort()
+        #print("ADDED AN")
+        #print(self.agents)
 
 

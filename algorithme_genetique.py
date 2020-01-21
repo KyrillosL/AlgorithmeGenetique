@@ -1,4 +1,8 @@
 import operator_selector as op_sel
+#import operator_selector_ALL_ALGO as op_sel
+import sys
+import time
+
 import classes
 import matplotlib
 matplotlib.use('tkAgg')
@@ -33,7 +37,9 @@ class Algorithme_genetique:
         return "1" * size
 
 
-    def solve(self, m, realtime_plot=True):
+    def solve(self, m, realtime_plot=True, realtime_counter=True):
+
+        start = time.time()
 
         # method = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
         if m==0:
@@ -46,6 +52,7 @@ class Algorithme_genetique:
             self.method = op_sel.adaptive_pursuit(self.population)
         elif m == 4:
             self.method = op_sel.upper_confidence_bound(self.population)
+            #self.method = op_sel.upper_confidence_bound(self.population.select_best_agents(1).get(0))
         #else:
         #    method = op_sel.upper_confidence_bound(self.population)
 
@@ -58,30 +65,66 @@ class Algorithme_genetique:
 
 
         while self.population.select_best_agents(1).get(0).score() != 1.0 :
+
+
+            '''
+            #self.population.croisement(self.population.select_best_agents(2).get(0), self.population.select_best_agents(2).get(1))
+            list_removed = self.population.remove_worst_agents()
+            new_agent = self.method.apply(self.population.select_best_agents(2).get(0))
+            new_agent.id = list_removed[0]
+            self.population.add_an_agent(new_agent, new_agent.id)
+            new_agent2 = self.method.apply(self.population.select_best_agents(2).get(1))
+            new_agent2.id=list_removed[1]
+            self.population.add_an_agent(new_agent2, new_agent2.id)
+            '''
             self.method.apply()
+
             self.score = self.population.select_best_agents(1).get(0).score()
-            print(self.score, " it ", self.iteration)
+
+
+
+
+
+
+
             self.time.append(self.iteration)
             self.data_score.append(self.score)
             for i in range(self.nb_op):
                 self.list_list_data_prob[i].append(self.method.list_operators[i].probability)
                 self.list_used_op[i].append(self.method.list_operators[i].times_used)
 
-            if self.iteration % 1000 == 0:
+
+
+            if realtime_counter:
+                end = time.time()
+                sys.stdout.write('\rScore : %.2f Iteration : %i Time %.2f' % (self.score, self.iteration, end - start))
+                sys.stdout.flush()
+
+
+            if realtime_plot and self.iteration % 1000 == 0:
                 self.update_plot()
+
+
 
             #if temp_score > self.population.select_best_agents(1).get(0).score():
             #    print("ERROR")
 
             temp_score = self.population.select_best_agents(1).get(0).score()
 
+
+            #self.population.ad
             self.iteration += 1
 
 
         #SHOW THE GRAPH AT THE END AND STAY IT
+        end = time.time()
+        sys.stdout.write('\rScore : %.2f Iteration : %i Time %.2f' % (self.score, self.iteration, end - start))
+        sys.stdout.flush()
+
         self.update_plot()
         plt.ioff()
         plt.show()
+
         print("NOMBRE ITERATION ", self.iteration)
         print("fin")
 
@@ -106,7 +149,7 @@ class Algorithme_genetique:
         elif m == 3:
             self.fig.suptitle('Method : Adaptive pursuit  | INFO : Only keeping the improving operator', fontsize=14, fontweight='bold')
         elif m == 4:
-            self.fig.suptitle('Method :UCB  | INFO : Only keeping the improving operator', fontsize=14, fontweight='bold')
+            self.fig.suptitle('Method :UCB  | INFO : Rewards displayed. Only keeping the improving operator', fontsize=14, fontweight='bold')
 
 
         gs = gridspec.GridSpec(3, 3)  # 2 rows, 3 columns

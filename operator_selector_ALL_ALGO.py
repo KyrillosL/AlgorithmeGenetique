@@ -3,7 +3,7 @@ Roulette fixe. On attribut une probabilité qui augmente et qui descend si les o
 f(popm) -> op1 -> f (popm+1)
 si f(popm+1) est mieux : on récompense(et on dégrade les autres), sinon on dégrade(et on récompense les autres).
 '''
-import operator_gen as op
+import operator_gen_ALL_ALGO as op
 
 import classes as main
 import matplotlib.pyplot as plt
@@ -18,8 +18,8 @@ import operator
 
 
 class Operator_Selector():
-    def __init__(self, population):
-        self.population = population
+    def __init__(self, agent):
+        self.agent = agent
         self.nb_operateurs = 3
         self.list_operators = [op.mutation_1_flip(1 / self.nb_operateurs), op.mutation_3_flip(1 / self.nb_operateurs),
                                op.mutation_5_flip(1 / self.nb_operateurs)]
@@ -139,8 +139,8 @@ class adaptive_pursuit(Operator_Selector):
 
 class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚𝑎𝑥𝑎[𝑄𝑡(𝑎)+𝑐𝑙𝑛𝑡𝑁𝑡(𝑎)‾‾‾‾‾√]
 
-    def __init__(self, population):
-        Operator_Selector.__init__(self, population)
+    def __init__(self, agent):
+        Operator_Selector.__init__(self, agent)
         self.nb_used = 0  # UCB
         self.average_reward = 0
         self.exploration = 1
@@ -148,12 +148,12 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
         self.iteration = 0
 
         for op in self.list_operators:
-            op.compute_Score(self.population.select_best_agents(1).get(0))
+            op.compute_Score(self.agent)
             op.average_rewards = op.score
             op.times_used = 1
 
-    def apply(self):
-
+    def apply(self,agent ):
+        self.agent=agent
         self.iteration += 1
         dict_score_ucb = {}
         for op in self.list_operators:
@@ -163,7 +163,7 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
 
         # print(dict_score_ucb)
         best_operator = max(dict_score_ucb.items(), key=operator.itemgetter(1))[0]
-        best_operator.compute_Score(self.population.select_best_agents(1).get(0))
+        best_operator.compute_Score(self.agent)
 
         # best_operator= self.list_operators[0]
         #for score_ucb in dict_score_ucb:
@@ -175,14 +175,16 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
         #if best_operator.score >= self.population.select_best_agents(1).get(0).score():
 
 
-        new_agent = best_operator.mutate(self.population.select_best_agents(1).get(0))
-        self.population.select_best_agents(1).set(0, new_agent)
+        new_agent = best_operator.mutate(self.agent)
+        #self.population.select_best_agents(1).set(0, new_agent)
         # best_operator.probability=1
         best_operator.times_used += 1
         # op.average_rewards = (op.score + (op.times_used - 1) * op.average_rewards) / op.times_used
         best_operator.average_rewards = (best_operator.score + (
                     best_operator.times_used - 1) * best_operator.average_rewards) / best_operator.times_used
         self.used_operator = best_operator
+
+        return new_agent
 
         # On baisse les autres :
         # for op in self.list_operators:
