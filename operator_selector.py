@@ -53,7 +53,7 @@ class roulette_fixe(Operator_Selector):  # NOT REALLY A FIX
 
         self.list_operators[id_selected_operator].compute_Score(self.population.select_best_agents(1).get(0))
         op = self.list_operators[id_selected_operator]
-        print("SCORE OP", op)
+        #print("SCORE OP", op)
 
         if op.score > self.population.select_best_agents(1).get(0).score():
             new_agent = op.mutate(self.population.select_best_agents(1).get(0))
@@ -172,17 +172,15 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
 
         # print("best_operator ", best_operator, " pop ", self.population.select_best_agents(1).get(0).score())
 
-        #if best_operator.score >= self.population.select_best_agents(1).get(0).score():
-
-
-        new_agent = best_operator.mutate(self.population.select_best_agents(1).get(0))
-        self.population.select_best_agents(1).set(0, new_agent)
-        # best_operator.probability=1
-        best_operator.times_used += 1
-        # op.average_rewards = (op.score + (op.times_used - 1) * op.average_rewards) / op.times_used
-        best_operator.average_rewards = (best_operator.score + (
-                    best_operator.times_used - 1) * best_operator.average_rewards) / best_operator.times_used
-        self.used_operator = best_operator
+        if best_operator.score >= self.population.select_best_agents(1).get(0).score():
+            new_agent = best_operator.mutate(self.population.select_best_agents(1).get(0))
+            self.population.select_best_agents(1).set(0, new_agent)
+            # best_operator.probability=1
+            best_operator.times_used += 1
+            # op.average_rewards = (op.score + (op.times_used - 1) * op.average_rewards) / op.times_used
+            best_operator.average_rewards = (best_operator.score + (
+                        best_operator.times_used - 1) * best_operator.average_rewards) / best_operator.times_used
+            self.used_operator = best_operator
 
         # On baisse les autres :
         # for op in self.list_operators:
