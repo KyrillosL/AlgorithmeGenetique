@@ -24,6 +24,8 @@ class Operator:
         self.times_used=0
 
         self.average_rewards = 0
+        self.average_rewards_array = []
+        self.weight = 1
 
 
     def __str__(self):

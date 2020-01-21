@@ -7,10 +7,11 @@ import operator_gen as op
 
 import classes as main
 import matplotlib.pyplot as plt
+from math import *
 
 import functions as functions
 import random
-
+from statistics import *
 plt.style.use('seaborn-whitegrid')
 import numpy as np
 import math
@@ -143,13 +144,14 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
         Operator_Selector.__init__(self, population)
         self.nb_used = 0  # UCB
         self.average_reward = 0
-        self.exploration = 1
+        self.exploration = 0.5
 
         self.iteration = 0
 
         for op in self.list_operators:
             op.compute_Score(self.population.select_best_agents(1).get(0))
             op.average_rewards = op.score
+            op.average_rewards_array.append(op.score)
             op.times_used = 1
 
     def apply(self):
@@ -157,8 +159,10 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
         self.iteration += 1
         dict_score_ucb = {}
         for op in self.list_operators:
-            dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(
-                math.log(self.iteration) / op.times_used)
+            #dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(math.log(self.iteration) / op.times_used)
+            dict_score_ucb[op]  =op.average_rewards + self.exploration * math.sqrt(math.log(self.iteration) / op.times_used)
+
+            #dict_score_ucb[op]= op.average_rewards+   self.exploration * math.sqrt(2*math.log(self.iteration) / op.times_used)
             op.probability = op.average_rewards
 
         # print(dict_score_ucb)
@@ -175,19 +179,55 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
         if best_operator.score >= self.population.select_best_agents(1).get(0).score():
             new_agent = best_operator.mutate(self.population.select_best_agents(1).get(0))
             self.population.select_best_agents(1).set(0, new_agent)
-            # best_operator.probability=1
             best_operator.times_used += 1
             # op.average_rewards = (op.score + (op.times_used - 1) * op.average_rewards) / op.times_used
-            best_operator.average_rewards = (best_operator.score + (
-                        best_operator.times_used - 1) * best_operator.average_rewards) / best_operator.times_used
+            #best_operator.average_rewards = (best_operator.score + (best_operator.times_used - 1) * best_operator.average_rewards) / best_operator.times_used
+            if len(best_operator.average_rewards_array)>50:
+                best_operator.average_rewards_array.pop(0)
+            best_operator.average_rewards_array.append(best_operator.score)
+            best_operator.average_rewards = mean(best_operator.average_rewards_array)
             self.used_operator = best_operator
 
-        # On baisse les autres :
-        # for op in self.list_operators:
-        #    if op != best_operator:
-        #        op.probability =0
 
-        # input()
+class exp3(Operator_Selector):
 
-        # operator_to_use = max(    )
+    def __init__(self, population, pmin=0.2, pmax=0.8, beta=0.5):
+        Operator_Selector.__init__(self, population)
+        self.beta = beta
+        self.pmin = pmin
+        self.pmax = pmax
+        self.exploration = 0.1 #LE POIDS DES POIDS. 0 -> BCP D'IMPORTANCE, 1 = PAS D'IMPORTANCE DES POIDS (LA PROB RESTE A 0.33)
 
+
+    def apply(self):
+
+        sum_weight = 0
+        for op in self.list_operators:
+            sum_weight+=op.weight
+
+
+        for op in self.list_operators:
+            op.probability = (1-self.exploration) * (op.weight/ sum_weight ) + (self.exploration/len(self.list_operators))
+
+
+        chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
+
+
+
+        chosen_op.compute_Score(self.population.select_best_agents(1).get(0))
+
+
+        #chosen_op.probability = chosen_op.probability * exp( (-self.exploration * chosen_op.score )/ (chosen_op.probability+0.01))
+
+        if chosen_op.score > self.population.select_best_agents(1).get(0).score():
+            chosen_op.times_used += 1
+            new_agent = chosen_op.mutate(self.population.select_best_agents(1).get(0))
+            self.population.select_best_agents(1).set(0, new_agent)
+            self.used_operator = chosen_op
+
+
+            new_reward = chosen_op.score / (chosen_op.probability + 0.01)
+
+            chosen_op.average_rewards = (new_reward + (
+                        chosen_op.times_used - 1) * chosen_op.average_rewards) / chosen_op.times_used
+            chosen_op.weight += exp(self.exploration * chosen_op.average_rewards / len(self.list_operators))

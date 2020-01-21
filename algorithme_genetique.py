@@ -53,9 +53,8 @@ class Algorithme_genetique:
         elif m == 4:
             self.method = op_sel.upper_confidence_bound(self.population)
             #self.method = op_sel.upper_confidence_bound(self.population.select_best_agents(1).get(0))
-        #else:
-        #    method = op_sel.upper_confidence_bound(self.population)
-
+        elif m == 5:
+            self.method = op_sel.exp3(self.population)
 
         self.init_plot(m)
 
@@ -150,6 +149,8 @@ class Algorithme_genetique:
             self.fig.suptitle('Method : Adaptive pursuit  | INFO : Only keeping the improving operator', fontsize=14, fontweight='bold')
         elif m == 4:
             self.fig.suptitle('Method :UCB  | INFO : Rewards displayed. Only keeping the improving operator', fontsize=14, fontweight='bold')
+        elif m == 5:
+            self.fig.suptitle('Method :EXP3  | INFO : Rewards displayed. Only keeping the improving operator', fontsize=14, fontweight='bold')
 
 
         gs = gridspec.GridSpec(3, 3)  # 2 rows, 3 columns
@@ -166,6 +167,8 @@ class Algorithme_genetique:
         self.txt_score = self.plt_score.text(1, 1, "", fontsize=20,color='red')
 
 
+
+
         #ALL PROBS PLOT
         self.all_probs= self.fig.add_subplot(gs[0,1:])
         self.all_probs.set_ylabel('All probs')
@@ -177,6 +180,8 @@ class Algorithme_genetique:
         self.plt_used_op.set_ylim([0, 1])
         self.plt_used_op.set_ylabel('Used Op')
         self.plt_used_op.set_xlabel('Generation')
+
+        self.line_score_used_op, = self.plt_used_op.plot([], lw=line_width, c='black')
 
 
 
@@ -259,6 +264,9 @@ class Algorithme_genetique:
             self.plt_score.axis([xmin_score, xmax_score, ymin_score, ymax_score])
             self.plt_score.set_xlim([0, self.iteration])
             self.line_score.set_data(self.time, self.data_score)
+
+
+
             self.txt_score.set_text("Score " + str(self.score))
             self.fig.canvas.restore_region(self.score_bg)
             # plt_score.draw_artist(line_score)
@@ -289,14 +297,20 @@ class Algorithme_genetique:
 
             # Used_OP
 
+
+
             xmin_score, xmax_score, ymin_score, ymax_score = [min(self.time) / 1.05, max(self.time) * 1.01, 0, max(
                 max(s) for s in zip(*self.list_used_op)) * 1.1]
             self.plt_used_op.axis([xmin_score, xmax_score, ymin_score, ymax_score])
             self.plt_used_op.set_xlim([0, self.iteration])
+
+            #self.line_score_used_op.set_data(self.time,  [i * max(
+            #    max(s) for s in zip(*self.list_used_op)) for i in self.data_score])
             self.fig.canvas.restore_region(self.plt_used_op_bg)
             for i in range(self.nb_op):
                 self.list_line_used_op[i].set_data(self.time, self.list_used_op[i])
                 #self.plt_used_op.draw_artist(self.list_line_used_op[i])
+
 
             self.fig.canvas.blit(self.plt_used_op.bbox)
             self.fig.canvas.flush_events()

@@ -6,3 +6,7 @@ q learning
 dmab
 
 offspring
+
+Si l'opérateur n'a pas été amélioré depuis un certain temps on le vire. =/= age.
+
+On pourrait varier le facteur d'exploration si on n'a pas amélioré depuis assez longtemps
