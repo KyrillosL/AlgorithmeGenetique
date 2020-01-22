@@ -4,18 +4,18 @@ import algorithme_genetique as ag
 
 parametres_algo = {
 "nombre_agents_par_population":20,
-"taille_agent":10000
+"taille_agent":100 #MAX 10 000 pour un temps raisonable < 1 min
 }
 
 "test"
 ag = ag.Algorithme_genetique(parametres_algo)
 
-#0 = best
-#1 = roulette fixe
-#2 = roulette adaptive
-#3= adaptive poursuit
-#4=ucb
-#5=Exp3
-ag.solve(5, realtime_plot=True, realtime_counter=True)
+#0 = best OK MARCHE BIEN
+#1 = roulette fixe OK RESULTAT ATTENDU
+#2 = roulette adaptive NON
+#3= adaptive poursuit OK MARCHE BIEN
+#4=ucb JOUER SUR LA FENETRE DE REWARD !!!!! DANS LE RAPPORT
+#5=Exp3 NE MARHCE QU'AVEC LES NON DEGRADNATS
+ag.solve(4, realtime_plot=True, realtime_counter=False)
 
 print(ag)

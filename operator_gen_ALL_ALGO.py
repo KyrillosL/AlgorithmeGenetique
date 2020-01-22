@@ -24,7 +24,9 @@ class Operator:
         self.times_used=0
 
         self.average_rewards = 0
-
+        self.average_rewards_array = []
+        self.weight = 1
+        self.times_not_rewarded = 0
 
     def __str__(self):
         return  "probability: " +str(self.probability) + " | Score : " + str(self.score)
@@ -39,8 +41,9 @@ class Operator:
 
     def compute_Score(self, agent):
         copy_of_agent = agent.__copy__()
-        self.mutate(copy_of_agent, True)
-        self.score =  copy_of_agent.score()
+        fianl_agent= self.mutate(copy_of_agent, True)
+        fianl_agent.get_score()
+        self.score = fianl_agent.score
 
     def __gt__(self, other):
         return (self.score > other.score)
@@ -78,7 +81,7 @@ class mutation_1_flip(Operator):
             self.temporary_bit_to_switch.append(bit_to_flip)
 
         super().switch_bit(agent_to_return, self.temporary_bit_to_switch[0])
-
+        agent_to_return.get_score()
         #print("Using 1n, new score: ", agent.score())
         return agent_to_return
 
@@ -119,6 +122,7 @@ class mutation_3_flip(Operator):
                 #print("x",x)
                 super().switch_bit(agent_to_return,x)
             #print("Using 3n, new score: ", agent.score())
+            agent_to_return.get_score()
             return agent_to_return
 
 class mutation_5_flip(Operator):
@@ -155,6 +159,7 @@ class mutation_5_flip(Operator):
                 #print("x", x)
                 super().switch_bit(agent_to_return,x)
             #print("Using 5n, new score: ", agent.score())
+            agent_to_return.get_score()
             return agent_to_return
 
 class mutation_bit_flip(Operator):

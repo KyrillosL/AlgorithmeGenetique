@@ -1,5 +1,5 @@
-import operator_selector as op_sel
-#import operator_selector_ALL_ALGO as op_sel
+# import operator_selector as op_sel
+import operator_selector_ALL_ALGO as op_sel
 import sys
 import time
 
@@ -43,18 +43,23 @@ class Algorithme_genetique:
 
         # method = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
         if m==0:
-            self.method = op_sel.best_operator_oracle(self.population)
+            # self.method = op_sel.best_operator_oracle(self.population)
+            self.method = op_sel.best_operator_oracle(self.population.select_best_agents(1).get(0))
         elif m==1:
-            self.method = op_sel.roulette_fixe(self.population)
+            # self.method = op_sel.roulette_fixe(self.population)
+            self.method = op_sel.roulette_fixe(self.population.select_best_agents(1).get(0))
         elif m == 2:
-            self.method = op_sel.roulette_adaptive(self.population)
+            # self.method = op_sel.roulette_adaptive(self.population)
+            self.method = op_sel.roulette_adaptive(self.population.select_best_agents(1).get(0))
         elif m == 3:
-            self.method = op_sel.adaptive_pursuit(self.population)
+            # self.method = op_sel.adaptive_pursuit(self.population)
+            self.method = op_sel.adaptive_pursuit(self.population.select_best_agents(1).get(0))
         elif m == 4:
-            self.method = op_sel.upper_confidence_bound(self.population)
-            #self.method = op_sel.upper_confidence_bound(self.population.select_best_agents(1).get(0))
+            # self.method = op_sel.upper_confidence_bound(self.population)
+            self.method = op_sel.upper_confidence_bound(self.population.select_best_agents(1).get(0))
         elif m == 5:
-            self.method = op_sel.exp3(self.population)
+            # self.method = op_sel.exp3(self.population)
+            self.method = op_sel.exp3(self.population.select_best_agents(1).get(0))
 
         self.init_plot(m)
 
@@ -63,22 +68,27 @@ class Algorithme_genetique:
         temp_score = 0
 
 
-        while self.population.select_best_agents(1).get(0).score() != 1.0 :
-
-
-            '''
+        while self.population.select_best_agents(1).get(0).get_score() != 1.0 :
+            # print("DEBUT")
+            #print(self.population)
             #self.population.croisement(self.population.select_best_agents(2).get(0), self.population.select_best_agents(2).get(1))
             list_removed = self.population.remove_worst_agents()
-            new_agent = self.method.apply(self.population.select_best_agents(2).get(0))
+            new_agent = self.method.apply(self.population.select_best_agents(2).get(0), keep_degrading=True)
             new_agent.id = list_removed[0]
             self.population.add_an_agent(new_agent, new_agent.id)
-            new_agent2 = self.method.apply(self.population.select_best_agents(2).get(1))
+            # print("AJOUT PREMIER")
+            # print(self.population)
+            # input()
+            new_agent2 = self.method.apply(self.population.select_best_agents(2).get(1),  keep_degrading=True)
             new_agent2.id=list_removed[1]
             self.population.add_an_agent(new_agent2, new_agent2.id)
-            '''
-            self.method.apply()
+            # print("AJOUT SECOND")
+            # print(self.population)
+            # input()
 
-            self.score = self.population.select_best_agents(1).get(0).score()
+            # self.method.apply()
+
+            self.score = self.population.select_best_agents(1).get(0).get_score()
 
 
 
@@ -108,7 +118,7 @@ class Algorithme_genetique:
             #if temp_score > self.population.select_best_agents(1).get(0).score():
             #    print("ERROR")
 
-            temp_score = self.population.select_best_agents(1).get(0).score()
+
 
 
             #self.population.ad

@@ -28,21 +28,23 @@ class Agent:
         self.data = list(data)
         self.size = len(data)
         self.id = id
+        self.score =0
 
     def __str__(self):
-        return "Agent " + str(self.id) + ", " + ''.join(self.data) + " | Score : " + str(self.score())
+        return "Agent " + str(self.id) + ", " + ''.join(self.data) + " | Score : " + str(self.get_score())
 
     def __repr__(self):
         return self.__str__()
 
     def __gt__(self, other):
-        return (self.score() > other.score())
+        return (self.score > other.score)
 
     def __copy__(self):
         return Agent(self.data, self.id)
 
-    def score(self):
-        return round( 1 - ((self.size - self.data.count('1')) / self.size), 4)
+    def get_score(self):
+        self.score= round( 1 - ((self.size - self.data.count('1')) / self.size), 10)
+        return self.score
 
 
 class Population:
@@ -63,7 +65,7 @@ class Population:
     def __str__(self):
         string_to_return = ""
         for agent in  self.agents:
-            string_to_return += (agent.__str__()+"\n")
+            string_to_return =string_to_return+ (agent.__str__()+"\n")
         return string_to_return
 
     def __repr__(self):
