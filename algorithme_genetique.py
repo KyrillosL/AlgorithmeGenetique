@@ -37,7 +37,7 @@ class Algorithme_genetique:
         return "1" * size
 
 
-    def solve(self, m, realtime_plot=True, realtime_counter=True):
+    def solve(self, m, realtime_plot=True,refresh_rate=1000, realtime_counter=True, keep_degrading=True):
 
         start = time.time()
 
@@ -66,41 +66,38 @@ class Algorithme_genetique:
         self.iteration = 0
 
         temp_score = 0
+        self.score = 0
 
 
         while self.population.select_best_agents(1).get(0).get_score() != 1.0 :
-            # print("DEBUT")
+            #print("DEBUT")
             #print(self.population)
             #self.population.croisement(self.population.select_best_agents(2).get(0), self.population.select_best_agents(2).get(1))
             list_removed = self.population.remove_worst_agents()
-            new_agent = self.method.apply(self.population.select_best_agents(2).get(0), keep_degrading=True)
+            new_agent = self.method.apply(self.population.select_best_agents(2).get(0), keep_degrading)
             new_agent.id = list_removed[0]
             self.population.add_an_agent(new_agent, new_agent.id)
-            # print("AJOUT PREMIER")
-            # print(self.population)
-            # input()
-            new_agent2 = self.method.apply(self.population.select_best_agents(2).get(1),  keep_degrading=True)
+            #print("AJOUT PREMIER")
+            #print(self.population)
+            #input()
+            new_agent2 = self.method.apply(self.population.select_best_agents(2).get(1),  keep_degrading)
             new_agent2.id=list_removed[1]
             self.population.add_an_agent(new_agent2, new_agent2.id)
-            # print("AJOUT SECOND")
-            # print(self.population)
-            # input()
+            #print("AJOUT SECOND")
+            #print(self.population)
+            #input()
 
             # self.method.apply()
 
-            self.score = self.population.select_best_agents(1).get(0).get_score()
 
 
-
-
-
-
-
-            self.time.append(self.iteration)
-            self.data_score.append(self.score)
-            for i in range(self.nb_op):
-                self.list_list_data_prob[i].append(self.method.list_operators[i].probability)
-                self.list_used_op[i].append(self.method.list_operators[i].times_used)
+            if self.iteration% 1==0:
+                self.score = self.population.select_best_agents(1).get(0).get_score()
+                self.time.append(self.iteration)
+                self.data_score.append(self.score)
+                for i in range(self.nb_op):
+                    self.list_list_data_prob[i].append(self.method.list_operators[i].probability)
+                    self.list_used_op[i].append(self.method.list_operators[i].times_used)
 
 
 
@@ -110,15 +107,8 @@ class Algorithme_genetique:
                 sys.stdout.flush()
 
 
-            if realtime_plot and self.iteration % 1000 == 0:
+            if realtime_plot and self.iteration % refresh_rate == 0:
                 self.update_plot()
-
-
-
-            #if temp_score > self.population.select_best_agents(1).get(0).score():
-            #    print("ERROR")
-
-
 
 
             #self.population.ad
@@ -134,7 +124,7 @@ class Algorithme_genetique:
         plt.ioff()
         plt.show()
 
-        print("NOMBRE ITERATION ", self.iteration)
+        print("\nNOMBRE ITERATION ", self.iteration)
         print("fin")
 
 

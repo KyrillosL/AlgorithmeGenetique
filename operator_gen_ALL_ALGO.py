@@ -50,10 +50,10 @@ class Operator:
 
     # Switch a bit in the string by an index.
     def switch_bit(self,agent, bit_to_flip):
-        if (agent.data[bit_to_flip] == '0') :
-            agent.data[bit_to_flip]='1'
+        if (agent.data[bit_to_flip] == 0) :
+            agent.data[bit_to_flip]=1
         else:
-            agent.data[bit_to_flip]='0'
+            agent.data[bit_to_flip]=0
 
 # Flip one random bit in the string
 class mutation_1_flip(Operator):
@@ -139,7 +139,8 @@ class mutation_5_flip(Operator):
         return self.__str__()
 
     def mutate(self, agent,is_computing=False):
-        #print("Using 5n, previous score: ", agent.score())
+
+        #print("Using 5n, previous score: ", agent.score)
         #only if the length of our data is > 3
         agent_to_return = agent.__copy__()
         if agent.size > 5:
@@ -160,6 +161,7 @@ class mutation_5_flip(Operator):
                 super().switch_bit(agent_to_return,x)
             #print("Using 5n, new score: ", agent.score())
             agent_to_return.get_score()
+
             return agent_to_return
 
 class mutation_bit_flip(Operator):

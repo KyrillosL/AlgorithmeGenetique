@@ -16,6 +16,6 @@ ag = ag.Algorithme_genetique(parametres_algo)
 #3= adaptive poursuit OK MARCHE BIEN
 #4=ucb JOUER SUR LA FENETRE DE REWARD !!!!! DANS LE RAPPORT
 #5=Exp3 NE MARHCE QU'AVEC LES NON DEGRADNATS
-ag.solve(4, realtime_plot=True, realtime_counter=False)
+ag.solve(0, realtime_plot=True, refresh_rate=100, realtime_counter=True, keep_degrading=True)
 
 print(ag)

@@ -10,3 +10,8 @@ offspring
 Si l'opérateur n'a pas été amélioré depuis un certain temps on le vire. =/= age.
 
 On pourrait varier le facteur d'exploration si on n'a pas amélioré depuis assez longtemps
+
+
+
+comparer le score en fonction du nb d'invidu
+UCB pdf en mettant la somme utilisé et non l'iteration

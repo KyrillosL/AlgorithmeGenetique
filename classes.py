@@ -17,6 +17,8 @@ import random
 from copy import copy
 
 import numpy as np
+import sys
+np.set_printoptions(threshold=sys.maxsize)
 
 
 class Agent:
@@ -25,13 +27,14 @@ class Agent:
     We can perform various mutations on the string """
 
     def __init__(self, data, id):
-        self.data = list(data)
+        self.data = np.array(data)
         self.size = len(data)
         self.id = id
         self.score =0
 
     def __str__(self):
-        return "Agent " + str(self.id) + ", " + ''.join(self.data) + " | Score : " + str(self.get_score())
+        #return "Agent " + str(self.id) + ", " + ''.join(self.data) + " | Score : " + str(self.get_score())
+        return "Agent " + str(self.id) + ", " + str(self.data.tolist()) + " | Score : " + str(self.get_score())
 
     def __repr__(self):
         return self.__str__()
@@ -43,7 +46,7 @@ class Agent:
         return Agent(self.data, self.id)
 
     def get_score(self):
-        self.score= round( 1 - ((self.size - self.data.count('1')) / self.size), 10)
+        self.score= round( 1 - ((self.size - np.sum(self.data)) / self.size), 10)
         return self.score
 
 
@@ -56,7 +59,8 @@ class Population:
             l = [0 for y in range(taille_agent)]
 
             #l = [random.randrange(0, 2) for y in range(taille_agent)]
-            self.agents.append(Agent("".join(str(x) for x in l), x))
+            #self.agents.append(Agent("".join(str(x) for x in l), x))
+            self.agents.append(Agent(  l, x))
         self.sort()
 
     def sort(self):

@@ -188,7 +188,9 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
         for op in self.list_operators:
             if len(op.average_rewards_array)>5:
                 op.average_rewards_array.pop(0)
-            dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(
+
+
+            dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(2*
                 math.log(self.iteration) / op.times_used)
             op.score = dict_score_ucb[op]
             op.probability = dict_score_ucb[op]
