@@ -168,9 +168,9 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
         Operator_Selector.__init__(self, agent)
         self.nb_used = 0  # UCB
         self.average_reward = 0
-        self.exploration =0.1
+        self.exploration =0.25
 
-        self.iteration = 0
+        self.iteration = 3
 
         for op in self.list_operators:
             op.compute_Score(self.agent)
@@ -182,16 +182,21 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
 
 
         self.agent=agent
-        self.iteration += 1
+
         dict_score_ucb = {}
-        sum_prob=0
+        #sum_prob=0
+        #sum_op = 0
         for op in self.list_operators:
-            if len(op.average_rewards_array)>5:
+            #sum_op+= op.times_used
+            if len(op.average_rewards_array)>10:
                 op.average_rewards_array.pop(0)
 
+        #print("SUM OP", sum_op)
+        #print("IT", self.iteration)
 
-            dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(2*
-                math.log(self.iteration) / op.times_used)
+        for op in self.list_operators:
+            #dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(2*math.log(self.iteration) / op.times_used)
+            dict_score_ucb[op] = op.average_rewards + self.exploration * math.sqrt(  math.log(self.iteration) / op.times_used)
             op.score = dict_score_ucb[op]
             op.probability = dict_score_ucb[op]
 
@@ -206,7 +211,7 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
 
 
         # print("best_operator ", best_operator, " pop ", self.agent.score())
-
+        self.iteration += 1
         if keep_degrading or best_operator.score > self.agent.get_score():
             new_agent = best_operator.mutate(self.agent)
             # self.population.select_best_agents(1).set(0, new_agent)
@@ -218,8 +223,27 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
             # if len(best_operator.average_rewards_array)>3:
             #       best_operator.average_rewards_array.pop(0)
 
+            '''
+            if  len(best_operator.average_rewards_array)>=2 and best_operator.score<=best_operator.average_rewards_array[-1]:
+                best_operator.times_not_rewarded += 1
+                #print("HERE")
 
+            else:
+                best_operator.times_not_rewarded = 0
 
+            if best_operator.times_not_rewarded >= 15:
+                best_operator.average_rewards_array.clear()
+                best_operator.average_rewards = 0
+                best_operator.times_not_rewarded =0
+            else:
+            '''
+            best_operator.average_rewards_array.append(best_operator.score)
+            best_operator.average_rewards = mean(best_operator.average_rewards_array)
+            return new_agent
+        else:
+            print("NOT USED")
+            return self.agent
+            '''
             if  len(best_operator.average_rewards_array)>=2 and best_operator.probability<=best_operator.average_rewards_array[-1]:
                 best_operator.times_not_rewarded += 1
                 print("HERE")
@@ -234,17 +258,15 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
             else:
                 best_operator.average_rewards_array.append(best_operator.score)
                 best_operator.average_rewards = mean(best_operator.average_rewards_array)
+            '''
+            #print(best_operator.times_not_rewarded )
 
-            print(best_operator.times_not_rewarded )
 
 
-
-            print(best_operator.average_rewards, ' op ' ,  best_operator,' time used ',best_operator.times_used )
+            #print(best_operator.average_rewards, ' op ' ,  best_operator,' time used ',best_operator.times_used )
             # input()
-            return new_agent
 
-        else:
-            return self.agent
+
 
 
 

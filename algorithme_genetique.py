@@ -37,8 +37,7 @@ class Algorithme_genetique:
         return "1" * size
 
 
-    def solve(self, m, realtime_plot=True,refresh_rate=1000, realtime_counter=True, keep_degrading=True):
-
+    def solve(self, m, realtime_plot=True,refresh_rate_plot=1000, realtime_counter=True, refresh_rate_counter= 1,  keep_degrading=True,one_indiv=False):
         start = time.time()
 
         # method = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
@@ -65,34 +64,33 @@ class Algorithme_genetique:
 
         self.iteration = 0
 
-        temp_score = 0
         self.score = 0
 
 
-        while self.population.select_best_agents(1).get(0).get_score() != 1.0 :
-            #print("DEBUT")
-            #print(self.population)
-            #self.population.croisement(self.population.select_best_agents(2).get(0), self.population.select_best_agents(2).get(1))
-            list_removed = self.population.remove_worst_agents()
-            new_agent = self.method.apply(self.population.select_best_agents(2).get(0), keep_degrading)
-            new_agent.id = list_removed[0]
-            self.population.add_an_agent(new_agent, new_agent.id)
-            #print("AJOUT PREMIER")
-            #print(self.population)
-            #input()
-            new_agent2 = self.method.apply(self.population.select_best_agents(2).get(1),  keep_degrading)
-            new_agent2.id=list_removed[1]
-            self.population.add_an_agent(new_agent2, new_agent2.id)
-            #print("AJOUT SECOND")
-            #print(self.population)
-            #input()
-
-            # self.method.apply()
+        while self.population.select_best_agents(1).get(0).get_score() != 1 :
 
 
 
-            if self.iteration% 1==0:
-                self.score = self.population.select_best_agents(1).get(0).get_score()
+            if one_indiv:
+                new_agent = self.method.apply(self.population.select_best_agents(1).get(0), keep_degrading)
+                self.population.get_agents().pop()
+                self.population.get_agents().append(new_agent)
+
+            else:
+                #self.population.croisement(self.population.select_best_agents(2).get(0), self.population.select_best_agents(2).get(1))
+                list_removed = self.population.remove_worst_agents()
+                new_agent = self.method.apply(self.population.select_best_agents(2).get(0), keep_degrading)
+                new_agent.id = list_removed[0]
+                self.population.add_an_agent(new_agent, new_agent.id)
+
+                new_agent2 = self.method.apply(self.population.select_best_agents(2).get(1),  keep_degrading)
+                new_agent2.id=list_removed[1]
+                self.population.add_an_agent(new_agent2, new_agent2.id)
+
+            self.score = self.population.select_best_agents(1).get(0).get_score()
+
+
+            if self.iteration% refresh_rate_counter==0:
                 self.time.append(self.iteration)
                 self.data_score.append(self.score)
                 for i in range(self.nb_op):
@@ -100,21 +98,18 @@ class Algorithme_genetique:
                     self.list_used_op[i].append(self.method.list_operators[i].times_used)
 
 
-
             if realtime_counter:
                 end = time.time()
-                sys.stdout.write('\rScore : %.2f Iteration : %i Time %.2f' % (self.score, self.iteration, end - start))
+                sys.stdout.write('\rScore : %.5f Iteration : %i Time %.2f' % (self.score, self.iteration, end - start))
                 sys.stdout.flush()
 
-
-            if realtime_plot and self.iteration % refresh_rate == 0:
+            if realtime_plot and self.iteration % refresh_rate_plot == 0:
                 self.update_plot()
 
 
-            #self.population.ad
             self.iteration += 1
 
-
+        print("fin")
         #SHOW THE GRAPH AT THE END AND STAY IT
         end = time.time()
         sys.stdout.write('\rScore : %.2f Iteration : %i Time %.2f' % (self.score, self.iteration, end - start))
@@ -125,7 +120,7 @@ class Algorithme_genetique:
         plt.show()
 
         print("\nNOMBRE ITERATION ", self.iteration)
-        print("fin")
+
 
 
     def init_plot(self, m):

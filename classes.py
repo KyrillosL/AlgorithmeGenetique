@@ -46,7 +46,7 @@ class Agent:
         return Agent(self.data, self.id)
 
     def get_score(self):
-        self.score= round( 1 - ((self.size - np.sum(self.data)) / self.size), 10)
+        self.score=  1 - ((self.size - np.sum(self.data)) / self.size)
         return self.score
 
 
