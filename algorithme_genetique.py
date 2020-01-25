@@ -37,37 +37,37 @@ class Algorithme_genetique:
         return "1" * size
 
 
-    def solve(self, m, realtime_plot=True,refresh_rate_plot=1000, realtime_counter=True, refresh_rate_counter= 1,  keep_degrading=True,one_indiv=False):
+    def solve(self, method=0, realtime_plot=True, refresh_rate_plot=1000, realtime_counter=True, refresh_rate_counter= 1, keep_degrading=True, one_indiv=False, stop_after=1000):
         start = time.time()
 
         # method = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
-        if m==0:
+        if method==0:
             # self.method = op_sel.best_operator_oracle(self.population)
             self.method = op_sel.best_operator_oracle(self.population.select_best_agents(1).get(0))
-        elif m==1:
+        elif method==1:
             # self.method = op_sel.roulette_fixe(self.population)
             self.method = op_sel.roulette_fixe(self.population.select_best_agents(1).get(0))
-        elif m == 2:
+        elif method == 2:
             # self.method = op_sel.roulette_adaptive(self.population)
             self.method = op_sel.roulette_adaptive(self.population.select_best_agents(1).get(0))
-        elif m == 3:
+        elif method == 3:
             # self.method = op_sel.adaptive_pursuit(self.population)
             self.method = op_sel.adaptive_pursuit(self.population.select_best_agents(1).get(0))
-        elif m == 4:
+        elif method == 4:
             # self.method = op_sel.upper_confidence_bound(self.population)
             self.method = op_sel.upper_confidence_bound(self.population.select_best_agents(1).get(0))
-        elif m == 5:
+        elif method == 5:
             # self.method = op_sel.exp3(self.population)
             self.method = op_sel.exp3(self.population.select_best_agents(1).get(0))
 
-        self.init_plot(m)
+        self.init_plot(method, keep_degrading)
 
         self.iteration = 0
 
         self.score = 0
 
 
-        while self.population.select_best_agents(1).get(0).get_score() != 1 :
+        while self.population.select_best_agents(1).get(0).get_score() != 1 and stop_after>= self.iteration :
 
 
 
@@ -123,7 +123,7 @@ class Algorithme_genetique:
 
 
 
-    def init_plot(self, m):
+    def init_plot(self, method, keep_degrading):
 
 
         self.nb_op = len(self.method.list_operators)
@@ -133,18 +133,21 @@ class Algorithme_genetique:
 
         self.fig = plt.figure(figsize=(20, 10))
 
+        info = "Taille population  "+str(self.nombre_agents_par_population) + " Taille individu : "+str(self.taille_agent)+ "\n" +" Keep degrading : " + str(keep_degrading)  +"\n"
 
-        if m==0:
-            self.fig.suptitle('Method : Oracle (Best Operator) | INFO : no probalities in this method ', fontsize=14, fontweight='bold')
-        elif m==1:
+
+        if method==0:
+            self.fig.suptitle(info+ ' Method : Oracle Myope | INFO : no probalities in this method ', fontsize=14, fontweight='bold')
+            self.fig
+        elif method==1:
             self.fig.suptitle('Method : Uniform (Fixed wheel probabilities) | INFO : all probs = 0.33. Only keeping the improving operator ', fontsize=14, fontweight='bold')
-        elif m == 2:
+        elif method == 2:
             self.fig.suptitle('Method : Adaptive wheel  | INFO : Only keeping the improving operator  ', fontsize=14, fontweight='bold')
-        elif m == 3:
+        elif method == 3:
             self.fig.suptitle('Method : Adaptive pursuit  | INFO : Only keeping the improving operator', fontsize=14, fontweight='bold')
-        elif m == 4:
+        elif method == 4:
             self.fig.suptitle('Method :UCB  | INFO : Rewards displayed. Only keeping the improving operator', fontsize=14, fontweight='bold')
-        elif m == 5:
+        elif method == 5:
             self.fig.suptitle('Method :EXP3  | INFO : Rewards displayed. Only keeping the improving operator', fontsize=14, fontweight='bold')
 
 
@@ -173,7 +176,7 @@ class Algorithme_genetique:
         #USED_OP PLOT
         self.plt_used_op= self.fig.add_subplot(gs[2,:])
         self.plt_used_op.set_ylim([0, 1])
-        self.plt_used_op.set_ylabel('Used Op')
+        self.plt_used_op.set_ylabel('Used Operator')
         self.plt_used_op.set_xlabel('Generation')
 
         self.line_score_used_op, = self.plt_used_op.plot([], lw=line_width, c='black')
@@ -190,7 +193,7 @@ class Algorithme_genetique:
             plt_probs = self.fig.add_subplot(gs[1,i])
             plt_probs.set_xlabel('Generation')
             if i==0:
-                if m==3:
+                if method==3:
                     line, = plt_probs.plot([],'o',markersize=2, lw=line_width, c='red')
                     line_all_probs, = self.all_probs.plot([],'o',markersize=2, lw=line_width-0.5, c='red')
                 else:
@@ -199,7 +202,7 @@ class Algorithme_genetique:
                 line_all_time_used, = self.plt_used_op.plot([], lw=line_width-0.5, c='red')
                 plt_probs.set_ylabel('flip 1_n')
             if i == 1:
-                if m == 3:
+                if method == 3:
                     line, = plt_probs.plot([],'o',markersize=2,  lw=line_width, c='green')
                     line_all_probs, = self.all_probs.plot([],'o',markersize=2, lw=line_width-0.5, c='green')
                 else:
@@ -208,7 +211,7 @@ class Algorithme_genetique:
                 line_all_time_used, = self.plt_used_op.plot([], lw=line_width - 0.5, c='green')
                 plt_probs.set_ylabel('flip 3_n')
             if i == 2:
-                if m == 3:
+                if method == 3:
                     line, = plt_probs.plot([],'o',markersize=2, lw=line_width, c='blue')
                     line_all_probs, = self.all_probs.plot([],'o',markersize=2, lw=line_width-0.5, c='blue')
                 else:
