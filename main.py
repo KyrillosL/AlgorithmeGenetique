@@ -3,8 +3,8 @@ import algorithme_genetique as ag
 
 
 parametres_algo = {
-"nombre_agents_par_population":1,
-"taille_agent":10 #MAX 10 000 pour un temps raisonable < 1 min
+"nombre_agents_par_population":20,
+"taille_agent":1000 #MAX 10 000 pour un temps raisonable < 1 min
 }
 
 "test"
@@ -19,6 +19,6 @@ ag = ag.Algorithme_genetique(parametres_algo)
 #refresh_rate_counter=parametres_algo["taille_agent"]/10
 
 
-ag.solve(method=0, realtime_plot=True, refresh_rate_plot=1000, realtime_counter=True,refresh_rate_counter=1,  keep_degrading=False, one_indiv=True, stop_after=10000, number_of_pass=3)
+ag.solve(method=1, realtime_plot=False, refresh_rate_plot=1, realtime_counter=True,refresh_rate_counter=1,  keep_degrading=True, one_indiv=False, stop_after=100000, number_of_pass=20)
 
 print(ag)

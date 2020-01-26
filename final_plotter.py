@@ -5,7 +5,7 @@ class Final_plotter:
         self.time_array=[]
         self.score_array=[]
         self.all_prob_array=[]
-        self.used_op=[]
+        self.used_op_array=[]
 
 
     def add_plot(self, time, score, all_probs, used ):
@@ -13,13 +13,58 @@ class Final_plotter:
         self.time_array.append(time)
         self.score_array.append(score)
         self.all_prob_array.append(all_probs)
-        self.used_op.append(used)
+        self.used_op_array.append(used)
 
-    def calculate_means(self):
-        self.final_time = []
+    def calculate_means(self, number_of_pass):
+        self.final_time = max(self.time_array)
 
-        max_time= max(max(s) for s in zip(*self.time_array))
-        print(max_time)
+        max_size_list = len(max(self.time_array))
+        for x in self.score_array:
+            x+=[1]*(max_size_list -len(x))
+        self.final_score = []
+        for i in range(max_size_list):
+            local_mean=0
+            for j in range(number_of_pass):
+                local_mean+= self.score_array[j][i]
+            local_mean/=number_of_pass
+            self.final_score.append(local_mean)
+
+        for x in self.all_prob_array:
+            for y in x:
+                y += [y[-1]] * (max_size_list - len(y))
+        self.final_prob = []
+        for i in range(3):
+            tmp = []
+            for j in range(max_size_list):
+                local_mean = 0
+                for k in range(number_of_pass):
+                    local_mean += self.all_prob_array[k][i][j]
+                local_mean /= number_of_pass
+                tmp.append(local_mean)
+            self.final_prob.append(tmp)
+
+
+        for x in self.used_op_array:
+            for y in x:
+                y+=[y[-1]]*(max_size_list -len(y))
+        self.final_used = []
+        for i in range(3):
+            tmp = []
+            for j in range(max_size_list):
+                local_mean = 0
+                for k in range(number_of_pass):
+                    local_mean += self.used_op_array[k][i][j]
+                local_mean/=number_of_pass
+                tmp.append(local_mean)
+            self.final_used.append(tmp)
+
+
+
+
+
+
+
+
         '''
         self.time_array=[0,50, 100]
         self.score_array=[0,0.8,1]
@@ -28,5 +73,6 @@ class Final_plotter:
         '''
 
 
-
+    def max_value(self, inputlist):
+        return max([sublist[-1] for sublist in inputlist])
 

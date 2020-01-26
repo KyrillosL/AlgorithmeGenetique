@@ -1,36 +1,19 @@
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
+
+
 class Myplot:
 
-    def __init__(self,method=0, keep_degrading=0, nb_op=3, nombre_agents_par_population=100, taille_agent=100):
-        self.score=0
+    def __init__(self, method=0, keep_degrading=0, nb_op=3, nombre_agents_par_population=100, taille_agent=100, number_of_pass=1):
+        self.keep_degrading=keep_degrading
+        self.method = method
+        self.score = 0
+        self.temps_moyen=0
         self.nb_op = nb_op
         self.nombre_agents_par_population = nombre_agents_par_population
-        self.taille_agent= taille_agent
+        self.taille_agent = taille_agent
         self.fig = plt.figure(figsize=(20, 10))
-        info = "Taille population  " + str(self.nombre_agents_par_population) + " Taille individu : " + str(
-            self.taille_agent) + "\n" + " Keep degrading : " + str(keep_degrading) + "\n"
-
-        if method == 0:
-            self.fig.suptitle(info + ' Method : Oracle Myope | INFO : no probalities in this method ', fontsize=14,
-                              fontweight='bold')
-            self.fig
-        elif method == 1:
-            self.fig.suptitle(
-                'Method : Uniform (Fixed wheel probabilities) | INFO : all probs = 0.33. Only keeping the improving operator ',
-                fontsize=14, fontweight='bold')
-        elif method == 2:
-            self.fig.suptitle('Method : Adaptive wheel  | INFO : Only keeping the improving operator  ', fontsize=14,
-                              fontweight='bold')
-        elif method == 3:
-            self.fig.suptitle('Method : Adaptive pursuit  | INFO : Only keeping the improving operator', fontsize=14,
-                              fontweight='bold')
-        elif method == 4:
-            self.fig.suptitle('Method :UCB  | INFO : Rewards displayed. Only keeping the improving operator', fontsize=14,
-                              fontweight='bold')
-        elif method == 5:
-            self.fig.suptitle('Method :EXP3  | INFO : Rewards displayed. Only keeping the improving operator', fontsize=14,
-                              fontweight='bold')
+        self.number_of_pass = number_of_pass
 
         gs = gridspec.GridSpec(3, 3)  # 2 rows, 3 columns
 
@@ -127,10 +110,35 @@ class Myplot:
         self.data_score = []
         self.data_score.append(0)
 
-        plt.show(block=False)
+        # plt.show(block=False)
+
+    def update_plot(self, temps_moyen, itetarion_moyen):
+
+        info = "Taille population  " + str(self.nombre_agents_par_population) + " Taille individu : " + str(self.taille_agent) + "\n" + " Keep degrading : " + str(self.keep_degrading) + "\n" + "Nombre iterations moyennes sur " + str(self.number_of_pass) + " Executions "+ str(itetarion_moyen)+ "\n" + "Temps moyen : " + str(temps_moyen) + "\n"
+
+        if self.method == 0:
+            self.fig.suptitle(info + ' Method : Oracle Myope | INFO : no probalities in this method ', fontsize=14,
+                              fontweight='bold')
+            self.fig
+        elif self.method == 1:
+            self.fig.suptitle(info +
+                'Method : Uniform (Fixed wheel probabilities) | INFO : all probs = 0.33.',
+                fontsize=14, fontweight='bold')
+        elif self.method == 2:
+            self.fig.suptitle(info + 'Method : Adaptive wheel  ', fontsize=14,
+                              fontweight='bold')
+        elif self.method == 3:
+            self.fig.suptitle(info + 'Method : Adaptive pursuit', fontsize=14,
+                              fontweight='bold')
+        elif self.method == 4:
+            self.fig.suptitle(info + 'Method :UCB | INFO : Rewards displayed instead of probabilities', fontsize=14,
+                              fontweight='bold')
+        elif self.method == 5:
+            self.fig.suptitle(info + 'Method :EXP3  ', fontsize=14,
+                              fontweight='bold')
 
 
-    def update_plot(self):
+
         # SCORE
         xmin_score, xmax_score, ymin_score, ymax_score = [min(self.time) / 1.05, max(self.time) * 1.01, 0, 1.1]
         self.plt_score.axis([xmin_score, xmax_score, ymin_score, ymax_score])

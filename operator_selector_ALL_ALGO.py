@@ -63,7 +63,7 @@ class roulette_fixe(Operator_Selector):  # NOT REALLY A FIX
 
 
 
-        if keep_degrading or chosen_op.score > self.agent.get_score():
+        if keep_degrading or op.score > self.agent.get_score():
             new_agent = op.mutate(self.agent)
             # self.population.select_best_agents(1).set(0, new_agent)
             op.times_used += 1

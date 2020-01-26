@@ -69,11 +69,12 @@ class Algorithme_genetique:
 
         final_plotter = fp.Final_plotter()
 
-
+        list_temps = []
+        list_it =[]
         for i in range(number_of_pass):
 
             start = time.time()
-            myplot = myplt.Myplot(method, keep_degrading, 3)
+            myplot = myplt.Myplot(method, keep_degrading, 3, self.nombre_agents_par_population, self.taille_agent, number_of_pass)
 
             self.iteration = 0
             self.reinit()
@@ -111,14 +112,16 @@ class Algorithme_genetique:
                         myplot.list_list_data_prob[i].append(self.method.list_operators[i].probability)
                         myplot.list_used_op[i].append(self.method.list_operators[i].times_used)
 
+                    final_plotter.add_plot(myplot.time, myplot.data_score, myplot.list_list_data_prob, myplot.list_used_op)
+
 
                 if realtime_counter:
                     end = time.time()
                     sys.stdout.write('\rScore : %.5f Iteration : %i Time %.2f' % (myplot.score, self.iteration, end - start))
                     sys.stdout.flush()
 
-                if realtime_plot and self.iteration % refresh_rate_plot == 0:
-                    myplot.update_plot()
+                #if realtime_plot and self.iteration % refresh_rate_plot == 0:
+                #    myplot.update_plot()
 
 
                 self.iteration += 1
@@ -127,23 +130,31 @@ class Algorithme_genetique:
             end = time.time()
             sys.stdout.write('\rScore : %.2f Iteration : %i Time %.2f' % (myplot.score, self.iteration, end - start))
             sys.stdout.flush()
+            list_it.append(self.iteration)
+            list_temps.append(end - start)
 
-            myplot.update_plot()
+            #myplot.update_plot()
 
-            myplot.turn_off_interactive_mode()
-            final_plotter.add_plot(myplot.time, myplot.data_score, myplot.list_list_data_prob, myplot.list_used_op)
+
             #
 
 
 
 
-        final_plotter.calculate_means()
-        myplot.time = final_plotter.time_array
-        myplot.data_score= final_plotter.score_array
-        for i in range(myplot.nb_op):
-            myplot.list_list_data_prob[i] =  final_plotter.all_prob_array[i]
-            myplot.list_used_op[i] = final_plotter.used_op[i]
-        myplot.update_plot()
+        final_plotter.calculate_means(number_of_pass)
+
+
+        myplot.time = final_plotter.final_time
+        myplot.data_score= final_plotter.final_score
+        myplot.list_list_data_prob =  final_plotter.final_prob
+        myplot.list_used_op = final_plotter.final_used
+
+
+        temps_moyen = sum(list_temps)/len(list_temps)
+        iteration_moyenne=sum(list_it)/len(list_it)
+
+        myplot.update_plot(temps_moyen, itetarion_moyen=iteration_moyenne)
+        myplot.turn_off_interactive_mode()
         myplot.show()
 
 
