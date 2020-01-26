@@ -10,6 +10,7 @@ import classes
 import matplotlib
 matplotlib.use('tkAgg')
 
+import matplotlib.pyplot as plt
 
 import numpy as np
 from matplotlib import gridspec
@@ -46,38 +47,50 @@ class Algorithme_genetique:
     def solve(self, method=0, realtime_plot=True, refresh_rate_plot=1000, realtime_counter=True, refresh_rate_counter= 1, keep_degrading=True, one_indiv=False, stop_after=1000, number_of_pass=1):
 
 
-        # method = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
-        if method==0:
-            # self.method = op_sel.best_operator_oracle(self.population)
-            self.method = op_sel.best_operator_oracle(self.population.select_best_agents(1).get(0))
-        elif method==1:
-            # self.method = op_sel.roulette_fixe(self.population)
-            self.method = op_sel.roulette_fixe(self.population.select_best_agents(1).get(0))
-        elif method == 2:
-            # self.method = op_sel.roulette_adaptive(self.population)
-            self.method = op_sel.roulette_adaptive(self.population.select_best_agents(1).get(0))
-        elif method == 3:
-            # self.method = op_sel.adaptive_pursuit(self.population)
-            self.method = op_sel.adaptive_pursuit(self.population.select_best_agents(1).get(0))
-        elif method == 4:
-            # self.method = op_sel.upper_confidence_bound(self.population)
-            self.method = op_sel.upper_confidence_bound(self.population.select_best_agents(1).get(0))
-        elif method == 5:
-            # self.method = op_sel.exp3(self.population)
-            self.method = op_sel.exp3(self.population.select_best_agents(1).get(0))
+
 
 
         final_plotter = fp.Final_plotter()
 
+
+
         list_temps = []
         list_it =[]
-        for i in range(number_of_pass):
+        for a in range(number_of_pass):
+            # method = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
+            if method == 0:
+                # self.method = op_sel.best_operator_oracle(self.population)
+                self.method = op_sel.best_operator_oracle(self.population.select_best_agents(1).get(0))
+            elif method == 1:
+                # self.method = op_sel.roulette_fixe(self.population)
+                self.method = op_sel.roulette_fixe(self.population.select_best_agents(1).get(0))
+            elif method == 2:
+                # self.method = op_sel.roulette_adaptive(self.population)
+                self.method = op_sel.roulette_adaptive(self.population.select_best_agents(1).get(0))
+            elif method == 3:
+                # self.method = op_sel.adaptive_pursuit(self.population)
+                self.method = op_sel.adaptive_pursuit(self.population.select_best_agents(1).get(0))
+            elif method == 4:
+                # self.method = op_sel.upper_confidence_bound(self.population)
+                self.method = op_sel.upper_confidence_bound(self.population.select_best_agents(1).get(0))
+            elif method == 5:
+                # self.method = op_sel.exp3(self.population)
+                self.method = op_sel.exp3(self.population.select_best_agents(1).get(0))
+
+            elif method == 6:
+                # self.method = op_sel.exp3(self.population)
+                self.method = op_sel.basic_operator_1_flip(self.population.select_best_agents(1).get(0))
 
             start = time.time()
-            myplot = myplt.Myplot(method, keep_degrading, 3, self.nombre_agents_par_population, self.taille_agent, number_of_pass)
-
+            #myplot = myplt.Myplot(method, keep_degrading, 3, self.nombre_agents_par_population, self.taille_agent, number_of_pass)
+            #myplot.turn_off_interactive_mode()
             self.iteration = 0
             self.reinit()
+
+            list_time=[]
+            list_data=[]
+            list_prob=[]
+            list_num_used=[]
 
 
 
@@ -93,6 +106,7 @@ class Algorithme_genetique:
 
                 else:
                     #self.population.croisement(self.population.select_best_agents(2).get(0), self.population.select_best_agents(2).get(1))
+
                     list_removed = self.population.remove_worst_agents()
                     new_agent = self.method.apply(self.population.select_best_agents(2).get(0), keep_degrading)
                     new_agent.id = list_removed[0]
@@ -102,23 +116,47 @@ class Algorithme_genetique:
                     new_agent2.id=list_removed[1]
                     self.population.add_an_agent(new_agent2, new_agent2.id)
 
-                myplot.score = self.population.select_best_agents(1).get(0).get_score()
+                    '''
+                    #AGE :
+                    list_removed = self.population.remove_old_agents()
+                    new_agent = self.method.apply(self.population.select_best_agents(2).get(0), keep_degrading)
+                    new_agent.id = list_removed[0]
+                    self.population.add_an_agent(new_agent, new_agent.id)
+
+                    new_agent2 = self.method.apply(self.population.select_best_agents(2).get(1),  keep_degrading)
+                    new_agent2.id=list_removed[1]
+                    self.population.add_an_agent(new_agent2, new_agent2.id)
+
+                    for x in self.population.agents:
+                        x.age+=1
+                    '''
+
+                #myplot.score = self.population.select_best_agents(1).get(0).get_score()
 
 
                 if self.iteration% refresh_rate_counter==0:
+                    '''
                     myplot.time.append(self.iteration)
                     myplot.data_score.append(myplot.score)
                     for i in range(myplot.nb_op):
                         myplot.list_list_data_prob[i].append(self.method.list_operators[i].probability)
                         myplot.list_used_op[i].append(self.method.list_operators[i].times_used)
+                    '''
 
-                    final_plotter.add_plot(myplot.time, myplot.data_score, myplot.list_list_data_prob, myplot.list_used_op)
+                    list_time.append(self.iteration)
+                    list_data.append(self.population.select_best_agents(1).get(0).get_score())
 
 
-                if realtime_counter:
-                    end = time.time()
-                    sys.stdout.write('\rScore : %.5f Iteration : %i Time %.2f' % (myplot.score, self.iteration, end - start))
-                    sys.stdout.flush()
+                    #final_plotter.add_plot(myplot.time, myplot.data_score, myplot.list_list_data_prob, myplot.list_used_op)
+                    final_plotter.add_plot_score_time(list_time, list_data)
+
+                    #myplot.update_plot(0,self.iteration)
+
+
+                #if realtime_counter:
+                    #end = time.time()
+                    #sys.stdout.write('\rScore : %.5f Iteration : %i Time %.2f' % (myplot.score, self.iteration, end - start))
+                    #sys.stdout.flush()
 
                 #if realtime_plot and self.iteration % refresh_rate_plot == 0:
                 #    myplot.update_plot()
@@ -128,12 +166,13 @@ class Algorithme_genetique:
 
             #SHOW THE GRAPH AT THE END AND STAY IT
             end = time.time()
-            sys.stdout.write('\rScore : %.2f Iteration : %i Time %.2f' % (myplot.score, self.iteration, end - start))
+            #sys.stdout.write('\rScore : %.2f Iteration : %i Time %.2f' % (myplot.score, self.iteration, end - start))
             sys.stdout.flush()
+            print(" \npass ", a , " itération ", self.iteration, " time ", end-start )
             list_it.append(self.iteration)
             list_temps.append(end - start)
 
-            #myplot.update_plot()
+
 
 
             #
@@ -141,20 +180,24 @@ class Algorithme_genetique:
 
 
 
-        final_plotter.calculate_means(number_of_pass)
+        #final_plotter.calculate_means(number_of_pass)
+        final_plotter.calculate_means_score_time(number_of_pass)
 
-
+        '''
         myplot.time = final_plotter.final_time
         myplot.data_score= final_plotter.final_score
         myplot.list_list_data_prob =  final_plotter.final_prob
         myplot.list_used_op = final_plotter.final_used
-
+        '''
 
         temps_moyen = sum(list_temps)/len(list_temps)
         iteration_moyenne=sum(list_it)/len(list_it)
 
-        myplot.update_plot(temps_moyen, itetarion_moyen=iteration_moyenne)
-        myplot.turn_off_interactive_mode()
-        myplot.show()
+        #myplot.update_plot(temps_moyen, itetarion_moyen=iteration_moyenne)
+        #myplot.turn_off_interactive_mode()
+        #myplot.show()
+        #myplot.close()
+
+        return final_plotter.final_time, final_plotter.final_score
 
 

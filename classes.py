@@ -31,7 +31,7 @@ class Agent:
         self.size = len(data)
         self.id = id
         self.score =0
-
+        self.age = 0
     def __str__(self):
         #return "Agent " + str(self.id) + ", " + ''.join(self.data) + " | Score : " + str(self.get_score())
         return "Agent " + str(self.id) + ", " + str(self.data.tolist()) + " | Score : " + str(self.get_score())
@@ -130,6 +130,23 @@ class Population:
         self.agents.remove(min(self.agents))
         list_to_return.append( min(self.agents).id)
         self.agents.remove(min(self.agents))
+
+        return list_to_return
+
+    def remove_old_agents(self):
+
+        list_to_return = []
+        for x in range(2):
+            max_age = self.agents[0].age
+            oldest_agent =self.agents[0]
+            for a in self.agents:
+                if max_age< a.age:
+                    max_age=a.age
+                    oldest_agent=a
+
+            list_to_return.append(oldest_agent.id)
+            self.agents.remove(oldest_agent)
+
 
         return list_to_return
 

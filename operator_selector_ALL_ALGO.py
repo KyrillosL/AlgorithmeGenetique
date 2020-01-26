@@ -26,6 +26,18 @@ class Operator_Selector():
                                op.mutation_5_flip(1 / self.nb_operateurs)]
 
 
+class  basic_operator_1_flip(Operator_Selector):
+    def apply(self, agent, keep_degrading):
+        self.agent=agent
+        x = self.list_operators[0]
+        x.compute_Score(agent)
+
+        if keep_degrading or x.score > self.agent.get_score():
+            new_agent = x.mutate(self.agent)
+            x.times_used+=1
+            return new_agent
+        else:
+            return self.agent
 
 class best_operator_oracle(Operator_Selector):
 
@@ -120,7 +132,7 @@ class adaptive_pursuit(Operator_Selector):
 
     def __init__(self, population, pmin=0.2, pmax=0.8, beta=0.5):
         Operator_Selector.__init__(self, population)
-        self.beta = beta
+        self.beta = 1
         self.pmin = pmin
         self.pmax = pmax
 
@@ -168,7 +180,7 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
         Operator_Selector.__init__(self, agent)
         self.nb_used = 0  # UCB
         self.average_reward = 0
-        self.exploration =0.25
+        self.exploration =1
 
         self.iteration = 3
 
@@ -188,7 +200,7 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
         #sum_op = 0
         for op in self.list_operators:
             #sum_op+= op.times_used
-            if len(op.average_rewards_array)>10:
+            if len(op.average_rewards_array)>5:
                 op.average_rewards_array.pop(0)
 
         #print("SUM OP", sum_op)
@@ -224,14 +236,15 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
             #       best_operator.average_rewards_array.pop(0)
 
             '''
-            if  len(best_operator.average_rewards_array)>=2 and best_operator.score<=best_operator.average_rewards_array[-1]:
+            if  len(best_operator.average_rewards_array)>=2 and best_operator.score<=best_operator.average_rewards_array[-1]+0.1:
                 best_operator.times_not_rewarded += 1
-                #print("HERE")
+
 
             else:
                 best_operator.times_not_rewarded = 0
 
             if best_operator.times_not_rewarded >= 15:
+
                 best_operator.average_rewards_array.clear()
                 best_operator.average_rewards = 0
                 best_operator.times_not_rewarded =0
@@ -241,7 +254,7 @@ class upper_confidence_bound(Operator_Selector):  # 𝐴𝑡≐𝑎𝑟𝑔𝑚�
             best_operator.average_rewards = mean(best_operator.average_rewards_array)
             return new_agent
         else:
-            print("NOT USED")
+            #print("NOT USED")
             return self.agent
             '''
             if  len(best_operator.average_rewards_array)>=2 and best_operator.probability<=best_operator.average_rewards_array[-1]:
@@ -278,7 +291,7 @@ class exp3(Operator_Selector):
         self.beta = beta
         self.pmin = pmin
         self.pmax = pmax
-        self.exploration = 0.01 #LE POIDS DES POIDS. 0 -> BCP D'IMPORTANCE, 1 = PAS D'IMPORTANCE DES POIDS (LA PROB RESTE A 0.33)
+        self.exploration = 1 #LE POIDS DES POIDS. 0 -> BCP D'IMPORTANCE, 1 = PAS D'IMPORTANCE DES POIDS (LA PROB RESTE A 0.33)
 
         '''
         #On start le meilleur opérateur avec une prob de 0.9

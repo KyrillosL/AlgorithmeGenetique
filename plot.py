@@ -12,14 +12,19 @@ class Myplot:
         self.nb_op = nb_op
         self.nombre_agents_par_population = nombre_agents_par_population
         self.taille_agent = taille_agent
+
+
         self.fig = plt.figure(figsize=(20, 10))
+
+
+
         self.number_of_pass = number_of_pass
 
         gs = gridspec.GridSpec(3, 3)  # 2 rows, 3 columns
 
         line_width = 2
 
-        plt.ion()
+        #plt.ion()
         # SCORE PLOT
         self.plt_score = self.fig.add_subplot(gs[0, 0])
         self.plt_score.set_ylim([0, 1.1])
@@ -110,7 +115,7 @@ class Myplot:
         self.data_score = []
         self.data_score.append(0)
 
-        # plt.show(block=False)
+        #plt.show(block=False)
 
     def update_plot(self, temps_moyen, itetarion_moyen):
 
@@ -136,6 +141,9 @@ class Myplot:
         elif self.method == 5:
             self.fig.suptitle(info + 'Method :EXP3  ', fontsize=14,
                               fontweight='bold')
+
+        elif self.method == 6:
+            self.fig.suptitle(info + 'Method :1n  ', fontsize=14,fontweight='bold')
 
 
 
@@ -189,9 +197,14 @@ class Myplot:
 
         self.fig.canvas.blit(self.plt_used_op.bbox)
         self.fig.canvas.flush_events()
+        #plt.show()
+
 
     def show(self):
         plt.show()
+
+    def close(self):
+        plt.close()
 
     def turn_off_interactive_mode(self):
         plt.ioff()
