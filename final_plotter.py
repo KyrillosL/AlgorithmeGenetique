@@ -25,6 +25,31 @@ class Final_plotter:
 
 
     def calculate_means(self, number_of_pass):
+
+        '''
+        arrays_score = [np.array(x) for x in self.score_array]
+
+        self.final_score = [np.mean(k) for k in zip(*arrays_score)]
+
+        arrays_time = [np.array(x) for x in self.time_array]
+
+        self.final_time = [np.mean(k) for k in zip(*arrays_time)]
+
+
+        self.final_prob=[]
+        for y in self.all_prob_array:
+            arrays_prob = [np.array(x) for x in y]
+            tmp = [np.mean(k) for k in zip(*arrays_prob)]
+            self.final_prob.append(tmp)
+
+
+        self.final_used=[]
+        for y in self.used_op_array:
+            arrays_used = [np.array(x) for x in y]
+            tmp = [np.mean(k) for k in zip(*arrays_used)]
+            self.final_used.append(tmp)
+        '''
+
         self.final_time = max(self.time_array)
 
         max_size_list = len(max(self.time_array))
@@ -74,12 +99,16 @@ class Final_plotter:
 
 
 
-        arrays = [np.array(x) for x in self.score_array]
+        arrays_score = [np.array(x) for x in self.score_array]
 
-        final = [np.mean(k) for k in zip(*arrays)]
-        print(final)
+        self.final_score = [np.mean(k) for k in zip(*arrays_score)]
 
-        self.final_time
+        arrays_time = [np.array(x) for x in self.time_array]
+
+        self.final_time = [np.mean(k) for k in zip(*arrays_time)]
+
+
+
 
         
 

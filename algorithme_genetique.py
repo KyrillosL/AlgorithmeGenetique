@@ -169,7 +169,9 @@ class Algorithme_genetique:
                     '\rScore : %.2f Iteration : %i Time %.2f' % (myplot.score, self.iteration, end - start))
                 sys.stdout.flush()
 
+
                 final_plotter.calculate_means(number_of_pass)
+
                 myplot.time = final_plotter.final_time
                 myplot.data_score = final_plotter.final_score
                 myplot.list_list_data_prob = final_plotter.final_prob
@@ -180,7 +182,6 @@ class Algorithme_genetique:
                 myplot.update_plot(temps_moyen, itetarion_moyen=iteration_moyenne)
                 myplot.turn_off_interactive_mode()
                 #myplot.show(block=True)
-            #else:
 
             print(" \n model ", method, " pass ", a, " itération ", self.iteration, " time ", end - start)
         if all_score:
