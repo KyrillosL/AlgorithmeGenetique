@@ -25,13 +25,13 @@ ag = ag.Algorithme_genetique(parametres_algo)
 #6= BASIC 1 N
 #refresh_rate_counter=parametres_algo["taille_agent"]/10
 
-all_score = False
+all_score = True
 
 if all_score:
     list_score=[]
     list_time=[]
     for i in range(7):
-        time,score = ag.solve(method=i, realtime_plot=False, refresh_rate_plot=1, realtime_counter=True,refresh_rate_counter=1,  keep_degrading=True, one_indiv=False, stop_after=10000, number_of_pass=100, all_score=True)
+        time,score = ag.solve(method=i, realtime_plot=False, refresh_rate_plot=1, realtime_counter=True,refresh_rate_counter=1,  keep_degrading=True, one_indiv=False, stop_after=10000, number_of_pass=15, all_score=True)
         list_score.append(score)
         list_time.append(time)
         plt.ioff()

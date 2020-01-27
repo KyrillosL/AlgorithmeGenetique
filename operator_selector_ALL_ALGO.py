@@ -8,7 +8,6 @@ import operator_gen_ALL_ALGO as op
 import classes as main
 import matplotlib.pyplot as plt
 
-import functions as functions
 import random
 from statistics import *
 from math import *

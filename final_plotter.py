@@ -97,15 +97,18 @@ class Final_plotter:
 
     def calculate_means_score_time(self, number_of_pass):
 
+        self.final_time = max(self.time_array)
 
 
+        max_size_list = len(max(self.time_array))
+        for x in self.score_array:
+            x+=[1]*(max_size_list -len(x))
         arrays_score = [np.array(x) for x in self.score_array]
-
         self.final_score = [np.mean(k) for k in zip(*arrays_score)]
 
-        arrays_time = [np.array(x) for x in self.time_array]
+        #arrays_time = [np.array(x) for x in self.time_array]
 
-        self.final_time = [np.mean(k) for k in zip(*arrays_time)]
+        #self.final_time = [np.mean(k) for k in zip(*arrays_time)]
 
 
 
