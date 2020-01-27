@@ -6,7 +6,7 @@ si f(popm+1) est mieux : on récompense(et on dégrade les autres), sinon on dé
 import operator_gen as op
 
 import classes as main
-import matplotlib.pyplot as plt
+
 from math import *
 
 import functions as functions

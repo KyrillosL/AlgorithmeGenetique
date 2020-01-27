@@ -1,5 +1,10 @@
-import matplotlib.pyplot as plt
+
+
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
 from matplotlib import gridspec
+
 
 
 class Myplot:
@@ -14,8 +19,8 @@ class Myplot:
         self.taille_agent = taille_agent
 
 
-        self.fig = plt.figure(figsize=(20, 10))
-
+        #self.fig = plt.figure(figsize=(20, 10))
+        self.fig = plt.figure(figsize=(10, 5))
 
 
         self.number_of_pass = number_of_pass
@@ -24,7 +29,7 @@ class Myplot:
 
         line_width = 2
 
-        #plt.ion()
+        plt.ion()
         # SCORE PLOT
         self.plt_score = self.fig.add_subplot(gs[0, 0])
         self.plt_score.set_ylim([0, 1.1])
@@ -201,7 +206,7 @@ class Myplot:
 
 
     def show(self):
-        plt.show()
+        plt.show(block=False)
 
     def close(self):
         plt.close()

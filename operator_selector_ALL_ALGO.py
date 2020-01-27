@@ -25,6 +25,25 @@ class Operator_Selector():
         self.list_operators = [op.mutation_1_flip(1 / self.nb_operateurs), op.mutation_3_flip(1 / self.nb_operateurs),
                                op.mutation_5_flip(1 / self.nb_operateurs)]
 
+    def weighted_choice(self):
+
+        weights = []
+        for x in self.list_operators:
+            weights.append(x.probability)
+
+        assert len(weights) == len(self.list_operators)
+        #print(weights)
+        assert abs(1. - sum(weights)) < 1e-6
+
+        x = random.random()
+        for i, elmt in enumerate(self.list_operators):
+            if x <= weights[i]:
+                #print("ELMT",i,  elmt)
+                return elmt
+            x -= weights[i]
+            #print("W",weights[i])
+            #print("x",x)
+
 
 class  basic_operator_1_flip(Operator_Selector):
     def apply(self, agent, keep_degrading):
@@ -109,12 +128,14 @@ class roulette_adaptive(Operator_Selector):
         sum_prob=0
         for op in self.list_operators:
             list_prob.append(round(op.probability, 1))
-            sum_prob+=round(op.probability,2)
+            sum_prob+=op.probability
 
 
         for op in self.list_operators:
-            op.probability/= sum_prob
-        chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
+           op.probability/= sum_prob
+        #chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
+
+        chosen_op = self.weighted_choice()
 
         chosen_op.compute_Score(self.agent)
 
@@ -132,7 +153,7 @@ class adaptive_pursuit(Operator_Selector):
 
     def __init__(self, population, pmin=0.2, pmax=0.8, beta=0.5):
         Operator_Selector.__init__(self, population)
-        self.beta = 1
+        self.beta = 0.2
         self.pmin = pmin
         self.pmax = pmax
 
@@ -154,14 +175,21 @@ class adaptive_pursuit(Operator_Selector):
             if op != best_operator:
                 op.probability += self.beta * (self.pmin - op.probability)
 
+
         sum_prob=0
         for op in self.list_operators:
-            sum_prob += round(op.probability, 2)
+            sum_prob += op.probability
         for op in self.list_operators:
             op.probability/= sum_prob
-        chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
+            #print(op)
+        #input()
 
-        # print("CHOSEN OP", chosen_op)
+
+
+
+        #chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
+        chosen_op= self.weighted_choice()
+        #print("CHOSEN OP", chosen_op)
 
         # input()
         chosen_op.compute_Score(self.agent)
@@ -291,7 +319,7 @@ class exp3(Operator_Selector):
         self.beta = beta
         self.pmin = pmin
         self.pmax = pmax
-        self.exploration = 1 #LE POIDS DES POIDS. 0 -> BCP D'IMPORTANCE, 1 = PAS D'IMPORTANCE DES POIDS (LA PROB RESTE A 0.33)
+        self.exploration = 0.1 #LE POIDS DES POIDS. 0 -> BCP D'IMPORTANCE, 1 = PAS D'IMPORTANCE DES POIDS (LA PROB RESTE A 0.33)
 
         '''
         #On start le meilleur opérateur avec une prob de 0.9
@@ -313,13 +341,14 @@ class exp3(Operator_Selector):
         sum_prob=0
         for op in self.list_operators:
             op.probability = (1-self.exploration) * (op.weight/ sum_weight ) + (self.exploration/len(self.list_operators))
-            sum_prob+=round(op.probability,2)
+            #sum_prob+=round(op.probability,2)
 
 
-        for op in self.list_operators:
-            op.probability/= sum_prob
+        #for op in self.list_operators:
+        #    op.probability/= sum_prob
 
-        chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
+        #chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
+        chosen_op = self.weighted_choice()
 
         chosen_op.compute_Score(self.agent)
 
