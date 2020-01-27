@@ -27,14 +27,18 @@ class Final_plotter:
     def calculate_means(self, number_of_pass):
 
         '''
-        arrays_score = [np.array(x) for x in self.score_array]
+        self.final_time = max(self.time_array)
 
+
+        max_size_list = len(max(self.time_array))
+        for x in self.score_array:
+            x+=[1]*(max_size_list -len(x))
+        arrays_score = [np.array(x) for x in self.score_array]
         self.final_score = [np.mean(k) for k in zip(*arrays_score)]
 
-        arrays_time = [np.array(x) for x in self.time_array]
-
-        self.final_time = [np.mean(k) for k in zip(*arrays_time)]
-
+        for x in self.all_prob_array:
+            for y in x:
+                y += [y[-1]] * (max_size_list - len(y))
 
         self.final_prob=[]
         for y in self.all_prob_array:
@@ -42,6 +46,9 @@ class Final_plotter:
             tmp = [np.mean(k) for k in zip(*arrays_prob)]
             self.final_prob.append(tmp)
 
+        for x in self.used_op_array:
+            for y in x:
+                y += [y[-1]] * (max_size_list - len(y))
 
         self.final_used=[]
         for y in self.used_op_array:
@@ -49,6 +56,7 @@ class Final_plotter:
             tmp = [np.mean(k) for k in zip(*arrays_used)]
             self.final_used.append(tmp)
         '''
+
 
         self.final_time = max(self.time_array)
 
@@ -107,13 +115,12 @@ class Final_plotter:
         self.final_score = [np.mean(k) for k in zip(*arrays_score)]
 
         #arrays_time = [np.array(x) for x in self.time_array]
-
         #self.final_time = [np.mean(k) for k in zip(*arrays_time)]
-
-
-
-
-        
+        '''
+        print("TIME ", self.final_time)
+        print("SCORE AARAY", self.score_array)
+        print("FINAL SCORE AARAY", self.final_score)
+        '''
 
         '''
         self.final_time = max(self.time_array)

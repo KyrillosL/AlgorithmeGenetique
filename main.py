@@ -31,7 +31,7 @@ if all_score:
     list_score=[]
     list_time=[]
     for i in range(7):
-        time,score = ag.solve(method=i, realtime_plot=False, refresh_rate_plot=1, realtime_counter=True,refresh_rate_counter=1,  keep_degrading=True, one_indiv=False, stop_after=10000, number_of_pass=15, all_score=True)
+        time,score = ag.solve(method=i, realtime_plot=False, refresh_rate_plot=1, realtime_counter=True,refresh_rate_counter=1,  keep_degrading=True, one_indiv=False, stop_after=10000, number_of_pass=5, all_score=True)
         list_score.append(score)
         list_time.append(time)
         plt.ioff()
@@ -47,10 +47,9 @@ if all_score:
         line.set_linewidth(5)
 
 
-    #plt.legend(['oracle', 'uniform', 'adaptive wheel', 'adaptive pursuit', 'ucb', 'exp3', '1Flip'], loc='upper left')
 
     plt.show(block=True)
 else:
     ag.solve(method=0, realtime_plot=False, refresh_rate_plot=1, realtime_counter=True,
                            refresh_rate_counter=1, keep_degrading=True, one_indiv=False, stop_after=10000,
-                           number_of_pass=1, all_score = False)
+                           number_of_pass=5, all_score = False)
