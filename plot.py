@@ -19,8 +19,8 @@ class Myplot:
         self.taille_agent = taille_agent
 
 
-        #self.fig = plt.figure(figsize=(20, 10))
-        self.fig = plt.figure(figsize=(10, 5))
+        self.fig = plt.figure(figsize=(20, 10))
+        #self.fig = plt.figure(figsize=(10, 5))
 
 
         self.number_of_pass = number_of_pass
@@ -205,8 +205,8 @@ class Myplot:
         #plt.show()
 
 
-    def show(self):
-        plt.show(block=False)
+    def show(self, block=True):
+        plt.show(block=block)
 
     def close(self):
         plt.close()

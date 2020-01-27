@@ -53,6 +53,8 @@ class Algorithme_genetique:
         list_temps = []
         list_it =[]
         for a in range(number_of_pass):
+
+
             # method = op_sel.upper_confidence_bound(self.population, 0.1, 0.9, 0.05)
             if method == 0:
                 # self.method = op_sel.best_operator_oracle(self.population)
@@ -156,16 +158,6 @@ class Algorithme_genetique:
                         list_data.append(self.population.select_best_agents(1).get(0).get_score())
                         final_plotter.add_plot_score_time(list_time, list_data)
 
-
-
-
-
-
-
-
-
-
-
                 self.iteration += 1
 
             end = time.time()
@@ -187,17 +179,19 @@ class Algorithme_genetique:
 
                 myplot.update_plot(temps_moyen, itetarion_moyen=iteration_moyenne)
                 myplot.turn_off_interactive_mode()
-                myplot.show()
-            else:
+                #myplot.show(block=True)
+            #else:
 
-                final_plotter.calculate_means_score_time(number_of_pass)
-
-
-
-            print(" \npass ", a , " itération ", self.iteration, " time ", end-start )
+            print(" \n model ", method, " pass ", a, " itération ", self.iteration, " time ", end - start)
+        if all_score:
+            final_plotter.calculate_means_score_time(number_of_pass)
 
 
 
+
+
+        if not all_score:
+            myplot.show(block=True)
         return final_plotter.final_time, final_plotter.final_score
 
 

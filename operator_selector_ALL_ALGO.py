@@ -109,6 +109,7 @@ class roulette_adaptive(Operator_Selector):
         Operator_Selector.__init__(self, agent)
         self.pmin = pmin
 
+
     def apply(self, agent, keep_degrading):
         self.agent = agent
 
@@ -122,7 +123,8 @@ class roulette_adaptive(Operator_Selector):
             sum_score_all_op += s.score
 
         for op in self.list_operators:
-            op.probability = self.pmin + (1 - self.pmin) * (op.score / sum_score_all_op)
+            op.probability = self.pmin + (1 - len(self.list_operators)*self.pmin) * (op.score / sum_score_all_op)
+
 
         list_prob = []
         sum_prob=0
@@ -133,6 +135,7 @@ class roulette_adaptive(Operator_Selector):
 
         for op in self.list_operators:
            op.probability/= sum_prob
+
         #chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
 
         chosen_op = self.weighted_choice()
@@ -153,7 +156,7 @@ class adaptive_pursuit(Operator_Selector):
 
     def __init__(self, population, pmin=0.2, pmax=0.8, beta=0.5):
         Operator_Selector.__init__(self, population)
-        self.beta = 0.2
+        self.beta = 0.9
         self.pmin = pmin
         self.pmax = pmax
 
@@ -319,7 +322,7 @@ class exp3(Operator_Selector):
         self.beta = beta
         self.pmin = pmin
         self.pmax = pmax
-        self.exploration = 0.1 #LE POIDS DES POIDS. 0 -> BCP D'IMPORTANCE, 1 = PAS D'IMPORTANCE DES POIDS (LA PROB RESTE A 0.33)
+        self.exploration = 0.5 #LE POIDS DES POIDS. 0 -> BCP D'IMPORTANCE, 1 = PAS D'IMPORTANCE DES POIDS (LA PROB RESTE A 0.33)
 
         '''
         #On start le meilleur opérateur avec une prob de 0.9
@@ -336,16 +339,23 @@ class exp3(Operator_Selector):
     def apply(self, agent, keep_degrading):
         self.agent = agent
         sum_weight = 0
+
+        for op in self.list_operators:
+            # sum_op+= op.times_used
+            if len(op.average_rewards_array) > 5:
+                op.average_rewards_array.pop(0)
+
+
         for op in self.list_operators:
             sum_weight+=op.weight
         sum_prob=0
         for op in self.list_operators:
             op.probability = (1-self.exploration) * (op.weight/ sum_weight ) + (self.exploration/len(self.list_operators))
-            #sum_prob+=round(op.probability,2)
+            sum_prob+=op.probability
 
 
-        #for op in self.list_operators:
-        #    op.probability/= sum_prob
+        for op in self.list_operators:
+            op.probability/= sum_prob
 
         #chosen_op = np.random.choice(self.list_operators, 1, [x.probability for x in self.list_operators])[0]
         chosen_op = self.weighted_choice()
@@ -357,9 +367,10 @@ class exp3(Operator_Selector):
             new_agent = chosen_op.mutate(self.agent)
             new_reward = chosen_op.score / (chosen_op.probability + 0.00)
 
-            chosen_op.average_rewards = (new_reward + (
-                    chosen_op.times_used - 1) * chosen_op.average_rewards) / chosen_op.times_used
+            #chosen_op.average_rewards = (new_reward + (chosen_op.times_used - 1) * chosen_op.average_rewards) / chosen_op.times_used
             chosen_op.weight += exp(self.exploration * chosen_op.average_rewards / len(self.list_operators))
+            chosen_op.average_rewards_array.append(chosen_op.score)
+            chosen_op.average_rewards = mean(chosen_op.average_rewards_array)
             return new_agent
         else:
             return self.agent

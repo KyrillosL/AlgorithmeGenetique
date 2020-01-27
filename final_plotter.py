@@ -1,3 +1,6 @@
+import statistics
+import numpy as np
+
 class Final_plotter:
 
     def __init__(self):
@@ -68,19 +71,44 @@ class Final_plotter:
 
 
     def calculate_means_score_time(self, number_of_pass):
+
+
+
+        arrays = [np.array(x) for x in self.score_array]
+
+        final = [np.mean(k) for k in zip(*arrays)]
+        print(final)
+
+        self.final_time
+
+        
+
+        '''
         self.final_time = max(self.time_array)
 
         max_size_list = len(max(self.time_array))
+
+
         for x in self.score_array:
-            x += [1] * (max_size_list - len(x))
+            x += [1.0] * (max_size_list - len(x))
+
         self.final_score = []
         for i in range(max_size_list):
             local_mean = 0
             for j in range(number_of_pass):
                 local_mean += self.score_array[j][i]
-            local_mean /= number_of_pass
+            local_mean= round(local_mean / number_of_pass,2)
             self.final_score.append(local_mean)
 
+        last_it_moy=0
+        for x in self.time_array:
+            last_it_moy+= x[-1]
+        last_it_moy/=len(self.time_array)
+        print("LAS IT MOY", last_it_moy)
+        print("TIME ", self.final_time)
+        print("SCORE AARAY", self.score_array)
+        print("FINAL SCORE AARAY", self.final_score)
+        '''
 
 
 
