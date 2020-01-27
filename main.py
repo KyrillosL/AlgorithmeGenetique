@@ -41,7 +41,9 @@ if all_score:
     for i in range(len(list_time)):
         plt.plot(list_time[i], list_score[i])
 
-    plt.legend(['oracle', 'uniform', 'adaptive wheel', 'adaptive pursuit', 'ucb', 'exp3', '1Flip'], loc='upper left')
+    plt.legend(['oracle', 'uniform', 'adaptive wheel', 'adaptive pursuit', 'ucb', 'exp3', '1Flip'], loc='lower right', fontsize=15)
+
+    #plt.legend(['oracle', 'uniform', 'adaptive wheel', 'adaptive pursuit', 'ucb', 'exp3', '1Flip'], loc='upper left')
 
     plt.show(block=True)
 else:
